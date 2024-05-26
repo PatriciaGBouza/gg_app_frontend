@@ -1,1 +1,34 @@
-<p>sign-up works!</p>
+<div class="sign-up-container">
+    <div class="sign-up-header">
+      <h1>Get started with your account</h1>
+      <p>Track your expenses. Share them with friends. Manage group finances effortlessly. Already have an account? <a routerLink="/sign-in">Log in</a></p>
+      <p>Registra tus gastos. Compártelos con amigos. Administra las finanzas del grupo sin esfuerzo. ¿Ya tienes una cuenta? <a routerLink="/sign-in">Inicia sesión</a></p>
+    </div>
+    <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="Email Address" formControlName="email" type="email" required>
+        <mat-error *ngIf="signUpForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="signUpForm.get('email')?.hasError('email')">Invalid email address</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill">
+        <mat-label>Username</mat-label>
+        <input matInput placeholder="Username" formControlName="firstName" required>
+        <mat-error *ngIf="signUpForm.get('firstName')?.hasError('required')">Username is required</mat-error>
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput placeholder="Password" type="password" formControlName="password" required>
+        <mat-error *ngIf="signUpForm.get('password')?.hasError('required')">Password is required</mat-error>
+      </mat-form-field>
+  
+      <div class="buttons">
+        <button mat-raised-button color="primary" type="submit">Sign Up</button>
+        <span>OR</span>
+        <button mat-raised-button color="accent" routerLink="/sign-in">Log In</button>
+      </div>
+    </form>
+  </div>
+  
