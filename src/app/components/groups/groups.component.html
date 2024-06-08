@@ -1,1 +1,60 @@
-<p>groups works!</p>
+<section>
+    <div class="container" >
+        <div class="row">
+            <div class="header">
+                <div class="header__top">Grupos gestionados por tí </div>
+                <div class='header__top--image'><img class="header__top__image" src="/assets/images/groups.png"></div>
+                <div class='header__top--icon'><mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="add"  [routerLink]="['/newgroup']"></mat-icon></div>
+            </div>
+
+            <div class="list-table">
+                <table mat-table [dataSource]="groupsInfo"  >
+
+
+                    
+                <!--- Note that these columns can be defined in any order.
+                    The actual rendered columns are set as a property on the row definition" -->
+            
+            
+            
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Nombre </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                </ng-container>
+            
+                <!-- Descrip Column -->
+                <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                </ng-container>
+            
+                <ng-container matColumnDef="options">
+                <th mat-header-cell *matHeaderCellDef>  </th>
+                <td mat-cell  *matCellDef="let element">
+                    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editgroup',element.id ]">
+                        <mat-icon>edit</mat-icon>
+                        <span>Edit</span>
+                        </button>
+                        <button mat-menu-item disabled>
+                        <mat-icon>other</mat-icon>
+                        <span>Second option</span>
+                        </button>
+                        <button mat-menu-item>
+                        <mat-icon>last option</mat-icon>
+                        <span>Third option</span>
+                        </button>
+                    </mat-menu>
+                </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        </div>   
+    </div>
+</section>
