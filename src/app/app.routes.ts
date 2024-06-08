@@ -15,7 +15,6 @@ export const routes: Routes = [
 { path: 'newgroup', component: GroupFormComponent},
 { path: 'editgroup/:id', component: GroupFormComponent},
 { path: 'expenses', component: ExpensesComponent},
-{ path: 'balance', component: BalanceComponent}
 { path: 'balance', component: BalanceComponent},
 { path: 'sign-in', component: SignInComponent },
 { path: 'sign-up', component: SignUpComponent },
