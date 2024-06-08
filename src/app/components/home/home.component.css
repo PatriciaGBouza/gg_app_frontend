@@ -1,0 +1,18 @@
+.panels{
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+    border-radius: 1rem;
+    width:  95%;
+    padding: 15px;
+   margin-top: 15px;
+   
+}
+
+.header__top{
+    font-size:  1.5rem;
+    font-weight: bold ;
+}
+
+.group__image{
+    width: 100px;
+}
