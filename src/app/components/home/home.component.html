@@ -1,1 +1,67 @@
-<p>home works!</p>
+<section>
+    <div class="container" >
+        <div class="row panels">
+            <p-carousel 
+            [value]="expenses" 
+            [numVisible]="3" 
+            [numScroll]="1" 
+            [responsiveOptions]="responsiveOptions">
+                <ng-template pTemplate="header">
+                    <p class="header__top">Tus gastos</p>
+                </ng-template>
+                <ng-template let-expense pTemplate="item">
+                    <div class="border-1 surface-border border-round m-2 p-3">
+                        <div class="mb-3">
+                            <div class="relative mx-auto">
+                                <img 
+                                    src="/assets/images/money.png" 
+                                    [alt]="expense.concept" 
+                                    class="w-full border-round" />
+                                <p-tag 
+                                    [value]="expense.status" 
+                                    [severity]="getExpenseStatus(expense.status)" 
+                                    class="absolute" 
+                                    [ngStyle]="{ 'left.px': 5, 'top.px': 5 }" />
+                            </div>
+                        </div>
+                        <div class="mb-3 font-medium">
+                            {{ expense.name }}
+                        </div>
+                     </div>
+                </ng-template>
+                
+            </p-carousel> 
+         </div>
+         <div class="row panels">
+            <p-carousel 
+            [value]="groupsInfo" 
+            [numVisible]="3" 
+            [numScroll]="1" 
+            [responsiveOptions]="responsiveOptions">
+                <ng-template pTemplate="header">
+                    <p class="header__top">Tus grupos</p>
+                </ng-template>
+                <ng-template let-group pTemplate="item">
+                    <div class="border-1 surface-border border-round m-2 p-3">
+                        <div class="mb-3">
+                            <div class="relative mx-auto">
+                                <img 
+                                    src="/assets/images/groups.png" 
+                                    [alt]="group.name" 
+                                    class="group__image border-round" />
+                               
+                            </div>
+                        </div>
+                        <div class="mb-3 font-medium">
+                            {{ group.name }}
+                        </div>
+                        
+                    </div>
+                </ng-template>
+                
+        </p-carousel>
+          </div>
+          
+          <app-balance></app-balance>
+          
+     </div>
