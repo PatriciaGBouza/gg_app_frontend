@@ -1,0 +1,23 @@
+<!--iniciar sesión-->
+<div class="sign-in-container">
+  <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+          <mat-icon matPrefix>person</mat-icon>
+          <input matInput placeholder="Username" formControlName="username" required>
+          <mat-error *ngIf="signInForm.get('username')?.hasError('required')">Username is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+          <mat-icon matPrefix>lock</mat-icon>
+          <input matInput placeholder="Password" formControlName="password" type="password" required>
+          <mat-error *ngIf="signInForm.get('password')?.hasError('required')">Password is required</mat-error>
+      </mat-form-field>
+
+      <div class="buttons">
+          <button mat-raised-button color="primary" type="submit">Sign In</button>
+          <span>OR</span>
+          <button mat-raised-button color="accent" routerLink="/sign-up">Sign Up</button>
+      </div>
+  </form>
+</div>
+
