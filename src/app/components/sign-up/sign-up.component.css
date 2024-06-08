@@ -1,0 +1,56 @@
+.sign-up-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  flex-direction: column;
+}
+
+.sign-up-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sign-up-header h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.sign-up-header p {
+  font-size: 14px;
+  color: #666;
+}
+
+form {
+  width: 100%;
+  max-width: 400px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.buttons span {
+  padding: 0 10px;
+  color: #666;
+}
+
+button {
+  width: 150px;
+  transition: transform 0.2s;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
