@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -14,7 +16,14 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrl: './nav.component.css'
 })
 export class NavComponent {
-  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+  @Input() view: 'principal' | 'authenticated' = 'principal';
+
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
+  constructor(public authService: AuthService, private router: Router, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
     iconRegistry.addSvgIcon(
       "settings",
       sanitizer.bypassSecurityTrustResourceUrl("/assets/images/settings.svg")

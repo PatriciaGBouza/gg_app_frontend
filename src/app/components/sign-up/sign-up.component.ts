@@ -6,6 +6,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { tap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-sign-up',
@@ -23,20 +26,40 @@ import { CommonModule } from '@angular/common';
 })
 export class SignUpComponent implements OnInit {
   signUpForm!: FormGroup;
+  hidePassword: boolean = true;
+  successMessage: string = '';
+  errorMessage: string = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.signUpForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      firstName: ['', [Validators.required]],
+      name: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
   }
 
-  onSubmit(): void {
+  onSubmit() {
     if (this.signUpForm.valid) {
-      this.router.navigate(['/dashboard']);
+      this.authService.register(this.signUpForm.value).pipe(
+        tap(response => {
+          this.successMessage = 'User registered successfully';
+          console.log(this.successMessage, response);
+          setTimeout(() => {
+            this.router.navigate(['/sign-in']);
+          }, 3000); // Redirect to sign-in after 3 seconds
+        }),
+        catchError(error => {
+          this.errorMessage = 'Registration failed. Please try again.';
+          console.error(this.errorMessage, error);
+          return of(error);
+        })
+      ).subscribe();
     }
+  }
+
+  togglePasswordVisibility() {
+    this.hidePassword = !this.hidePassword;
   }
 }

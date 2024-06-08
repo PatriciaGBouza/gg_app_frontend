@@ -1,5 +1,11 @@
-<header><app-nav></app-nav></header>
-
-<main><router-outlet/></main>
-
-<footer></footer>
+<header>
+    @if (authService.isLoggedIn()) {
+      <app-nav view="authenticated"></app-nav>
+    }
+  </header>
+  
+  <main>
+      <router-outlet></router-outlet>
+  </main>
+  
+  <footer></footer>

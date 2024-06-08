@@ -5,3 +5,21 @@
   .icon {
     fill:white;
   }
+  
+  mat-toolbar {
+    background-color: #3f51b5;
+    color: white;
+  }
+  
+  mat-toolbar button {
+    color: white;
+  }
+  
+  mat-toolbar button[routerLinkActive="active"] {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  mat-toolbar span {
+    font-size: 20px;
+  }
+  
