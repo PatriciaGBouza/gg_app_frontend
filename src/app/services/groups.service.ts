@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IGroup } from '../interfaces/igroup.interface';
 import { GROUPS } from '../db/groups.db';
 import { IUser } from '../interfaces/iuser.interface';
+import { IParticipant } from '../interfaces/iparticipant.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +30,11 @@ export class GroupsService {
   }
 
 
-  insert(aGroup:IGroup, aUser:IUser): IGroup{
+  insert(aGroup:IGroup, participants: IParticipant[], aUser:IUser): IGroup{
     this.lastId++;
     aGroup.id=this.lastId;
     aGroup.createdBy=aUser.id;
+    aGroup.participants=participants;
     this.arrGroups.push(aGroup);
     return aGroup;
   }

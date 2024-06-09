@@ -36,11 +36,24 @@
      
   }
 
+  .stepbutton{
+    border-radius: 25% / 50%;
+    padding-inline: 10px;
+  }
+  .stepper{
+    padding: 2rem;
+  
+  }
+
 .details-form__top{
    
     padding-bottom: 10px;
     width:  100%;
     font-size:  1.2rem;
+}
+
+.details-form__row{
+    padding: 10px;
 }
 
 
@@ -79,6 +92,15 @@
     color: red;
     font-size: 85%;
     
+}
+
+.p-stepper {
+    flex-basis: 50rem;
+} 
+
+.scrollable{
+    max-height:200px;
+    overflow:scroll
 }
 
 .test{

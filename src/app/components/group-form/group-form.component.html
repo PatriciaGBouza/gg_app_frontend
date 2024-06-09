@@ -1,107 +1,144 @@
 <div class="container">
     <div class="row">
-        <form class="details-form"  [formGroup]="modelForm" (ngSubmit)="saveFormData()">
+        <form class="details-form "  [formGroup]="modelForm" (ngSubmit)="saveFormData()">
             @if (isEmptyForm){
                 <div class='details-form__top ' >Crear grupo</div>
                 
             }@else {
                 <div class='details-form__top' >Actualiza los datos de tu grupo</div>
             }
-                             
 
-                <div class="container">
-                    <div class="row">
-                        <div class="col-2 ">
-                            <!--p-fileUpload 
-                            mode="basic" 
-                            name="demo[]" 
-                            chooseIcon="pi pi-upload" 
-                            accept="image/*" maxFileSize="1000000" 
-                            
-                            [auto]="true" 
-                            chooseLabel="Imagen del grupo" /-->
-                        </div>
-                        <div class="col-10 ">
-                                      
-                                <label for="name"  class="details-form__form-field__label">Nombre del grupo</label>
-                                <input 
-                                    pInputText  class="details-form__form-field__input" 
-                                    id="name" 
-                                    formControlName="name"/>
-                                                      
-                                    @if (validateField('name', 'required')){
-                                        <small id="name-help"  class="details-form__form-field__smalllabel error">
-                                            * Obligatorio
-                                        </small>
-                               
-                                    }
-                        </div>
-                    </div>
+            <p-toast position="bottom-left" key="br" />
+                                        
+            <div >
+            <p-stepper class="stepper">
                 
-                    <div class="details-form__row ">
-                        <div  class='details-form__form-field ' >
-                                <label for="description" class="details-form__form-field__label" >Descripción</label>
-                                <input 
-                                    pInputText class="details-form__form-field__input"  
-                                    id="description" 
-                                    formControlName="description"/>
+                <p-stepperPanel header="Datos básicos" >
+                    <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
+                        <div class="flex flex-column h-12rem">
+                            <div class="border-1 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                                
+                                <div class="container">
+                                        <div class="details-form__row">
+                                            <div  class='details-form__form-field ' >
+                                                      
+                                                <label for="name"  class="details-form__form-field__label">Nombre del grupo</label>
+                                                <input 
+                                                    pInputText  class="details-form__form-field__input" 
+                                                    id="name" 
+                                                    formControlName="name"/>
+                                                                      
+                                                    @if (validateField('name', 'required')){
+                                                        <small id="name-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                               
+                                                    }
+                                        </div>
+                                    </div>
+                                
+                                    <div class="details-form__row ">
+                                        <div  class='details-form__form-field ' >
+                                                <label for="description" class="details-form__form-field__label" >Descripción</label>
+                                                <input 
+                                                    pInputText class="details-form__form-field__input"  
+                                                    id="description" 
+                                                    formControlName="description"/>
+                                                   
+                
+                                                    @if (validateField('description', 'required')){
+                                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                                    }
+                                        </div>
+                                    </div>
+                                      
+                                 
                                    
-
-                                    @if (validateField('description', 'required')){
-                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
-                                            * Obligatorio
-                                        </small>
-                                    }
-                        </div>
-                    </div>
-                    @if (!isEmptyForm){
-                        <div class="details-form__row ">
-                            <div  class='details-form__form-field ' >
-                                    <label for="description" class="details-form__form-field__label" >Listado de participantes</label>
-                                    <!--p-table [value]="products" [tableStyle]="{'min-width': '60rem'}">
-                                        <ng-template pTemplate="caption">
-                                            <div class="flex align-items-center justify-content-between">
-                                                Products
-                                                <p-button icon="pi pi-refresh" />
-                                            </div>
-                                        </ng-template>
-                                        <ng-template pTemplate="header">
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Image</th>
-                                                <th>Price</th>
-                                                <th>Category</th>
-                                                <th>Reviews</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template pTemplate="body" let-product>
-                                            <tr>
-                                                <td>{{product.name}}</td>
-                                                <td><img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image" [alt]="product.name" width="100" class="shadow-4" /></td>
-                                                <td>{{product.price | currency:'USD'}}</td>
-                                                <td>{{product.category}}</td>
-                                                <td><p-rating [(ngModel)]="product.rating" [readonly]="true" [cancel]="false" /></td>
-                                                <td><p-tag [value]="product.inventoryStatus" [severity]="getSeverity(product.inventoryStatus)" /></td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template pTemplate="summary">
-                                            <div class="flex align-items-center justify-content-between">
-                                                In total there are {{products ? products.length : 0 }} products.
-                                            </div>
-                                        </ng-template>
-                                    </!--p-table>-->
-                                    
+                                </div>             
+                                              
                             </div>
                         </div>
+                        
+                        <div class="flex pt-4 justify-content-end">
+                            <p-button 
+                                label="Agregar/Modificar participantes" [text]="true" (onClick)="nextCallback.emit()" />
 
-                    }
-
-                    <div  class="details-form__submit"  > <button mat-flat-button color="primary" [disabled]="modelForm.invalid" >Guardar</button></div>
-                   
-                </div>             
+                             
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+                <p-stepperPanel header="Participantes">
+                    <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" let-index="index">
+                        <div class="flex flex-column h-12rem">
+                            <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                             
                               
-           
+                                    <div class="details-form__row ">
+                                        <div  class='details-form__form-field ' >
+                                                <label class="details-form__form-field__label" >Listado de participantes</label>
+                                                <div class="flex flex-column align-items-center justify-content-center scrollable">
+                                                    <p-tree 
+                                                        [value]="participants" 
+                                                        selectionMode="checkbox" 
+                                                        class="w-full md:w-30rem" 
+                                                        [(selection)]="selectedParticipants" />
+                                                </div>
+                                                
+                                        </div>
+                                    </div>
+
+                                    
+                                    <input type="text" pInputText id="inviteEmail" formControlName="inviteEmail"  />
+
+                                    @if ( emailEmpty()){
+                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="true" />
+                                    }@else if (validateField('inviteEmail', 'pattern')){
+                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
+                                            * Formato inválido
+                                        </small>
+                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="true" />
+                                    }@else {
+                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="false" />
+                                    }
+                               
+                                
+
+
+                            </div>
+                        </div>
+                        <div class="flex pt-4 justify-content-between">
+                            <p-button [text]="true"
+                                label="Volver" 
+                                
+                                (onClick)="prevCallback.emit()" />
+                            <p-button  [text]="true"
+                                label="Agregar/Modificar imagen" 
+                               
+                                (onClick)="nextCallback.emit()" />
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+                <p-stepperPanel header="Imagen de grupo">
+                    <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
+                        <div class="flex flex-column h-12rem">
+                            <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                                Content III
+                            </div>
+                        </div>
+                        <div class="flex pt-4 justify-content-start ">
+                            <p-button  [text]="true"
+                                label="Volver" 
+                                (onClick)="prevCallback.emit()" />
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+            </p-stepper>
+            <footer>
+            <div  class="details-form__submit"  > <button mat-flat-button color="primary" [disabled]="modelForm.invalid" >Guardar y cerrar</button></div>
+            </footer>
+            </div> 
             
                   
         </form>

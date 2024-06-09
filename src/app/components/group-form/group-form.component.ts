@@ -8,15 +8,21 @@ import { TableModule } from 'primeng/table';
 import { GroupsService } from '../../services/groups.service';
 import { IUser } from '../../interfaces/iuser.interface';
 import { switchMap } from 'rxjs';
-import { IGroup } from '../../interfaces/igroup.interface';
+import { StepperModule } from 'primeng/stepper';
+import { Message, TreeNode } from 'primeng/api';
+import { GroupParticipantsService } from '../../services/group-participants.service';
+import { TreeModule } from 'primeng/tree';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 
 @Component({
   selector: 'app-group-form',
   standalone: true,
-  imports: [ReactiveFormsModule, InputTextModule, FileUploadModule, TableModule, MatButtonModule ],
+  imports: [ReactiveFormsModule, InputTextModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,TreeModule ,ToastModule],
+  providers: [MessageService],
   templateUrl: './group-form.component.html',
-  styleUrl: './group-form.component.css'
+  styleUrl: './group-form.component.css'  
 })
 
 
@@ -27,26 +33,57 @@ export class GroupFormComponent {
 
 
   groupsService = inject(GroupsService);
+  participantsService = inject(GroupParticipantsService);
 
 
   modelForm: FormGroup|any;
   isEmptyForm: boolean|any;
 
+  messages: Message[] = [];
+
   user: IUser={ id: 1};
 
   selectedId: string|any;
 
-  constructor() {
+
+  participants!: TreeNode[];
+  selectedParticipants!: TreeNode[];
+
+  invitationsCount=0;
+
+
+   /*
+   Pattern to verify email addresses. Take a look at match / not match. It works very well. E-mail, email, mail, e-mail address, email address, mail address.
+Matches	
+john-smith@example.com | john.smith@example.com | john_smith@x-ample.com
+Non-Matches	
+.john-smith@example.com | @example.com | johnsmith@example.
+      */
+emailPattern =
+'^[0-9a-zA-Z]+([0-9a-zA-Z]*[-._+])*[0-9a-zA-Z]+@[0-9a-zA-Z]+([-.][0-9a-zA-Z]+)*([0-9a-zA-Z]*[.])[a-zA-Z]{2,6}$';
+/* This regex matches fully qualified external urls (http, https). It uses the ms specific group-naming structure to present friendly named groups back to the user.
+Matches	
+http://www.myserver.mydomain.com/myfolder/mypage.aspx
+Non-Matches	
+www.myserver.mydomain.com/myfolder/mypage.aspx*/
+
+
+  constructor(private messageService: MessageService) {
     this.modelForm = new FormGroup(
       {
         name: new FormControl(null, [Validators.required]),
-        description: new FormControl(null, [Validators.required])
-        
+        description: new FormControl(null, [Validators.required]),
+        inviteEmail: new FormControl(null, [Validators.pattern(this.emailPattern)])
       },
       []
     );
    
-    this.isEmptyForm = true;
+      this.isEmptyForm = true;
+      this.initParticipants(this.user);
+      this.selectedParticipants=[];
+      this.invitationsCount=0;
+      this.messageService=messageService;
+      
   }
   
 
@@ -57,26 +94,28 @@ export class GroupFormComponent {
       if (selectedId !== undefined) {
         //case: edit group
       if(isNaN(selectedId)){
-        alert(
-          'Error. Por favor, contacte con el administrador.'
-       );
+          this.messages.push(
+            { severity: 'error', summary: 'Error', detail: 'Por favor, contacte con el administrador' }
+          );
        } else{
         let aGroup =this.groupsService.getById(Number.parseInt(selectedId));
         //console.log(" ngOnInit edit "+ aGroup?.name);
         if (aGroup && aGroup.id){
           this.isEmptyForm = false;
+          let mykeys=['53'];
+          this.preselectParticipants(mykeys);
           this.modelForm = new FormGroup(
             {
               id: new FormControl(aGroup.id, []),
               name: new FormControl(aGroup.name, [Validators.required]),
-              description: new FormControl(aGroup.description, [Validators.required])
-              
+              description: new FormControl(aGroup.description, [Validators.required]),
+              inviteEmail: new FormControl("", [ Validators.pattern(this.emailPattern)])
             },
             []
           );
         }else{
-          alert(
-            'Error cargando datos del grupo. Por favor, contacte con el administrador.'
+          this.messages.push(
+            { severity: 'error', summary: 'Error cargando datos de grupo', detail: 'Por favor, contacte con el administrador' }
           );
         }
 
@@ -99,9 +138,9 @@ export class GroupFormComponent {
               []
             );
           }else{
-            alert(
-              'Error cargando datos del grupo. Por favor, contacte con el administrador.'
-            );
+            this.messages.push(
+            { severity: 'error', summary: 'Error cargando datos de grupo', detail: 'Por favor, contacte con el administrador' }
+          );
           }
         });*/
        }
@@ -110,8 +149,38 @@ export class GroupFormComponent {
   }
  
       
- 
+ initParticipants(aUser:IUser): void{
+  this.participants = this.participantsService.getAllAvailableParticipants(aUser);
   
+ }
+
+ preselectParticipants(keys: string[]){
+  console.log('Preselect participants ' +keys);
+  this.preselectNodes(keys,this.participants);
+ }
+
+
+ sendInvitation(){
+  console.log('Send Invitation '+ this.modelForm.value.inviteEmail);
+  
+  let newNode = {
+    key: 'TOBEADDED'+this.invitationsCount,
+    label:  this.modelForm.value.inviteEmail + ' (Invitar)',
+    data:  this.modelForm.value.inviteEmail,
+    icon: '',
+    children: [
+    ]
+  };
+  this.selectedParticipants.push(newNode);
+  this.participants.unshift(newNode);
+  this.messageService.add(
+    { severity: 'info', summary: 'Email añadido correctamente', detail: 'Email ' +  this.modelForm.value.inviteEmail +  ' añadido correctamente' , key: 'br', life: 3000 }
+  );
+  this.modelForm.get('inviteEmail').reset();
+  this.invitationsCount++;
+ 
+ }
+   
 
   validateField(
     formControlName: string,
@@ -123,8 +192,16 @@ export class GroupFormComponent {
     );
   }
 
+  emailEmpty(){
+    let value=this.modelForm.get('inviteEmail').value;
+    return (value == null || ((typeof value === 'string' || Array.isArray(value)) && value.length === 0));
+    
+  }
+
+  
 
   saveFormData(): void {
+    
    if (this.modelForm.value.id) {
       console.log(' saveFormData update');
       //update
@@ -136,46 +213,73 @@ export class GroupFormComponent {
           let aGroup = data;
           */
           if (aGroup.id) {
-            alert(
-              'Group ' +
-              aGroup.id +  ' ' + aGroup.name +
-                ' ' +
-                aGroup.description +
-                ' actualizado correctamente'
+            this.messageService.add(
+              { severity: 'success', summary: 'Group actualizado correctamente', detail: 'Grupo ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' actualizado correctamente' , key: 'br', life: 3000  }
             );
+          
             this.modelForm.reset();
             this.router.navigate(['/groups']);
           } else {
-            alert(
-              'Error durante la actualización. Por favor, contacte con el administrador.'
-            );
+            this.messages.push(
+              { severity: 'error', summary: 'Error durante la actualización', detail: 'Por favor, contacte con el administrador' }
+            )
           }
         /* });*/
     } else {
       console.log('saveFormData insert');
       //insert
-        let aGroup = this.groupsService.insert(this.modelForm.value, this.user);
+      console.log('selected part' + this.selectedParticipants);
+        let aGroup = this.groupsService.insert(this.modelForm.value, [], this.user);
         /*.subscribe((data: IGroup) => {
           console.log('groupsService.insert returned ' + JSON.stringify(data));
           let aGroup = data;*/
 
           if (aGroup.id) {
-            alert(
-              'NUEVO Group ' +
-              aGroup.id +  ' ' + aGroup.name +
-                ' ' +
-                aGroup.description +
-                ' creado correctamente'
+            this.messageService.add(
+              { severity: 'success', summary: 'Group creado correctamente', detail: 'Nuevo group ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' creado correctamente' , key: 'br', life: 3000 }
             );
+            
             this.modelForm.reset();
             this.router.navigate( [ '/editgroup', aGroup.id ] );
           } else {
-            alert(
-              'Error durante la creación del grupo. Por favor, contacte con el administrador.'
-            );
+            this.messages.push(
+              { severity: 'error', summary: 'Error durante la creación', detail: 'Por favor, contacte con el administrador' }
+            )
           }
        /* });*/
    /* }*/
   }
   }
+
+  isTreeNode = (item: TreeNode | undefined): item is TreeNode => { return !!item }
+
+  preselectNodes(keys: string[], allNodes: TreeNode[]): void {
+    this.selectedParticipants = keys.map(key => this.getNodeWithKey(key, allNodes)).filter(this.isTreeNode);
+  }
+
+  
+
+  getNodeWithKey(key: string, nodes: TreeNode[]): TreeNode | undefined {
+    for (let node of nodes) {
+     
+      if (node.key === key) {
+          return node;
+      }
+ 
+      if (node.children) {
+        let matchedNode = this.getNodeWithKey(key, node.children);
+        if (matchedNode) {
+          return matchedNode;
+        }
+      }
+    }
+    return undefined;
+ }
+
+
+ 
+ showBottomRight() {
+  this.messageService.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', key: 'br', life: 3000 });
+}
+ 
 }
