@@ -10,14 +10,17 @@ import { PrincipalComponent } from './components/principal/principal.component';
 import { authGuard } from './guards/auth.guard';
 import { nonAuthGuard } from './guards/non-auth.guard';
 import { UserSettingsComponent} from './components/usersettings/usersettings.component';
+import { ExpenseFormComponent } from './components/expense-form/expense-form.component';
 
 export const routes: Routes = [
 { path: '', pathMatch: 'full', component: PrincipalComponent },
 { path: 'home', component: HomeComponent, canActivate: [authGuard] },
 { path: 'groups', component: GroupsComponent, canActivate: [authGuard] },
-{ path: 'newgroup', component: GroupFormComponent},
-{ path: 'editgroup/:id', component: GroupFormComponent},
+{ path: 'newgroup', component: GroupFormComponent,canActivate: [authGuard] },
+{ path: 'editgroup/:id', component: GroupFormComponent,canActivate: [authGuard] },
 { path: 'expenses', component: ExpensesComponent, canActivate: [authGuard] },
+{ path: 'newexpense', component: ExpenseFormComponent,canActivate: [authGuard]},
+{ path: 'editexpense/:id', component: ExpenseFormComponent,canActivate: [authGuard]},
 { path: 'balance', component: BalanceComponent, canActivate: [authGuard] },
 { path: 'sign-in', component: SignInComponent, canActivate: [nonAuthGuard] },
 { path: 'sign-up', component: SignUpComponent, canActivate: [nonAuthGuard] },

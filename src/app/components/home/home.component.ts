@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-
 import { CarouselModule } from 'primeng/carousel';
 import { PanelModule } from 'primeng/panel';
 import { TagModule } from 'primeng/tag';
@@ -9,12 +8,13 @@ import { GroupsService } from '../../services/groups.service';
 import { IUser } from '../../interfaces/iuser.interface';
 import {ChartModule} from 'primeng/chart';
 import { BalanceComponent } from '../balance/balance.component';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [PanelModule,CarouselModule, TagModule, ChartModule, BalanceComponent],
+  imports: [RouterLink,PanelModule,CarouselModule, TagModule, ChartModule, BalanceComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

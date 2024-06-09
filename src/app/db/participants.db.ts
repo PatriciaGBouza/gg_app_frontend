@@ -6,7 +6,7 @@ export const PARTICIPANTS_TREEDATA: any [] = [
     {
          key: '53',
          label: 'Leonor Ayala',
-         data: 'Leonor Ayala',
+         data: 'Leonorrr Ayala',
          icon: '',
          children: []
      },

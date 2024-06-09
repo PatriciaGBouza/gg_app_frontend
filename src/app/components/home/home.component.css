@@ -16,3 +16,10 @@
 .group__image{
     width: 100px;
 }
+
+.test{
+    border-color: red;
+    border-width: 5px;
+    border-style: dashed;
+}
+

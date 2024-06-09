@@ -6,7 +6,7 @@ export interface IGroup {
     description: string;
     createdBy: number;
     image: string;
-    createdOn: number;
+    createdOn: Date;
     participants: IParticipant[];
     
 }

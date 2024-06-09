@@ -1,0 +1,88 @@
+
+.details-form{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin: 1% auto;
+    width:  95%;
+    padding: 2rem;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+    border-radius: 1rem;
+     
+  }
+
+  .stepbutton{
+    border-radius: 25% / 50%;
+    padding-inline: 10px;
+  }
+  .stepper{
+    padding: 2rem;
+  
+  }
+
+.details-form__top{
+   
+    padding-bottom: 10px;
+    width:  100%;
+    font-size:  1.2rem;
+}
+
+.details-form__row{
+    padding: 10px;
+}
+
+
+  .details-form__submit{
+    margin-top:1rem;
+  }
+
+  .details-form__form-field{
+    flex-basis: 100%;
+    flex-grow: 1;
+  }
+
+.details-form__form-field__label{
+      font-size: 1rem;
+      display: block;
+    }
+
+.details-form__form-field__smalllabel{
+    font-size: small;
+    display: block;  
+}
+
+
+ .details-form__form-field__input{
+      font-size: 1rem;
+      width: 100%;
+ }
+
+ .list-table{
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+    border-radius: 1rem;
+}
+
+.error{
+    color: red;
+    font-size: 85%;
+    
+}
+
+.p-stepper {
+    flex-basis: 50rem;
+} 
+
+.scrollable{
+    max-height:200px;
+    overflow:scroll
+}
+
+.test{
+    border-color: red;
+    border-width: 5px;
+    border-style: dashed;
+}
+
+    
