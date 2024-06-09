@@ -1,4 +1,4 @@
-import { IExpense } from "./iexpense.interface";
+import { IParticipant } from "./iparticipant.interface";
 
 export interface IGroup {
     id?: number;
@@ -7,5 +7,6 @@ export interface IGroup {
     createdBy: number;
     image: string;
     createdOn: number;
+    participants: IParticipant[];
     
 }

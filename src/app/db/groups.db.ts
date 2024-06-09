@@ -8,7 +8,9 @@ export const GROUPS: IGroup [] = [
         description: 'Celebramos la abuela cumple 90!',
         createdBy: 1,
         image: "https://placehold.co/200x200",
-        createdOn: Date.now()
+        createdOn: Date.now(),
+        participants: [ {id: 54,
+            name: 'Marina Garcia', image: ''}]
     },
     { 
         id: 2,
@@ -16,7 +18,8 @@ export const GROUPS: IGroup [] = [
         description: 'Qué bien lo pasamos',
         createdBy: 1,
         image: '',
-        createdOn: Date.now()
+        createdOn: Date.now(),
+        participants: []
     },
     { 
         id: 3,
@@ -24,7 +27,8 @@ export const GROUPS: IGroup [] = [
         description: 'Padel domingueros 2024',
         createdBy: 1,
         image: '',
-        createdOn: Date.now()
+        createdOn: Date.now(),
+        participants: []
     },
     { 
         id: 4,
@@ -32,7 +36,8 @@ export const GROUPS: IGroup [] = [
         description: 'Descr grupo',
         createdBy: 1,
         image: '',
-        createdOn: Date.now()
+        createdOn: Date.now(),
+        participants: []
     },
     
     { 
@@ -41,7 +46,8 @@ export const GROUPS: IGroup [] = [
         description: 'Otro desc',
         createdBy: 2,
         image: '',
-        createdOn: Date.now()
+        createdOn: Date.now(),
+        participants: []
     }
     
 
