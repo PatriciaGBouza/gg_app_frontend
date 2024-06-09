@@ -10,6 +10,7 @@ import { PrincipalComponent } from './components/principal/principal.component';
 import { authGuard } from './guards/auth.guard';
 import { nonAuthGuard } from './guards/non-auth.guard';
 import { UserSettingsComponent} from './components/usersettings/usersettings.component';
+import { ExpenseFormComponent } from './components/expense-form/expense-form.component';
 
 export const routes: Routes = [
 { path: '', pathMatch: 'full', component: PrincipalComponent },
@@ -18,7 +19,8 @@ export const routes: Routes = [
 { path: 'newgroup', component: GroupFormComponent},
 { path: 'editgroup/:id', component: GroupFormComponent},
 { path: 'expenses', component: ExpensesComponent, canActivate: [authGuard] },
-{ path: 'balance', component: BalanceComponent, canActivate: [authGuard] },
+{ path: 'newexpense', component: ExpenseFormComponent},
+{ path: 'editexpense/:id', component: ExpenseFormComponent},
 { path: 'sign-in', component: SignInComponent, canActivate: [nonAuthGuard] },
 { path: 'sign-up', component: SignUpComponent, canActivate: [nonAuthGuard] },
 { path: 'settings', component: UserSettingsComponent, canActivate: [authGuard] },

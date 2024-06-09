@@ -36,7 +36,7 @@
                         <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editgroup',element.id ]">
+                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editgroup',element.id ]" [queryParams]="{parent: 'list'}">
                         <mat-icon>edit</mat-icon>
                         <span>Edit</span>
                         </button>

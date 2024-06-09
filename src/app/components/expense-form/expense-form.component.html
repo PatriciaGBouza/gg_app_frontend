@@ -2,10 +2,10 @@
     <div class="row">
         <form class="details-form "  [formGroup]="modelForm" (ngSubmit)="saveFormData()">
             @if (isEmptyForm){
-                <div class='details-form__top ' >Crear grupo</div>
+                <div class='details-form__top ' >Crear gasto</div>
                 
             }@else {
-                <div class='details-form__top' >Actualiza los datos de tu grupo</div>
+                <div class='details-form__top' >Actualiza los datos del gasto</div>
             }
 
             <p-toast position="bottom-left" key="br" />
@@ -22,14 +22,14 @@
                                         <div class="details-form__row">
                                             <div  class='details-form__form-field ' >
                                                       
-                                                <label for="name"  class="details-form__form-field__label">Nombre del grupo</label>
+                                                <label for="concept"  class="details-form__form-field__label">Concepto</label>
                                                 <input 
                                                     pInputText  class="details-form__form-field__input" 
-                                                    id="name" 
-                                                    formControlName="name"/>
+                                                    id="concept" 
+                                                    formControlName="concept"/>
                                                                       
-                                                    @if (validateField('name', 'required')){
-                                                        <small id="name-help"  class="details-form__form-field__smalllabel error">
+                                                    @if (validateField('concept', 'required')){
+                                                        <small id="concept-help"  class="details-form__form-field__smalllabel error">
                                                             * Obligatorio
                                                         </small>
                                                
@@ -39,22 +39,90 @@
                                 
                                     <div class="details-form__row ">
                                         <div  class='details-form__form-field ' >
-                                                <label for="description" class="details-form__form-field__label" >Descripción</label>
+                                                <label for="amount" class="details-form__form-field__label" >Cantidad</label>
                                                 <input 
                                                     pInputText class="details-form__form-field__input"  
-                                                    id="description" 
-                                                    formControlName="description"/>
+                                                    id="amount" 
+                                                    formControlName="amount"/>
                                                    
                 
-                                                    @if (validateField('description', 'required')){
-                                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
+                                                    @if (validateField('amount', 'required')){
+                                                        <small id="amount-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                                    }
+                                        </div>
+                                    </div>
+
+                                    <div class="details-form__row">
+                                        <div  class='details-form__form-field' >
+                                                <label for="paidBy" class="details-form__form-field__label" >Pagado por</label>
+                                                <input 
+                                                    pInputText class="details-form__form-field__input"  
+                                                    id="paidBy" 
+                                                    formControlName="paidBy"/>
+                                                   
+                                                    @if (validateField('paidBy', 'required')){
+                                                        <small id="paidBy-help"  class="details-form__form-field__smalllabel error">
                                                             * Obligatorio
                                                         </small>
                                                     }
                                         </div>
                                     </div>
                                       
-                                 
+                                    <div class="details-form__row ">
+                                        <div  class='details-form__form-field' >
+                                                <label for="expenseDate" class="details-form__form-field__label" >Fecha del pago</label>
+                                                <p-calendar class="details-form__form-field__input"  
+                                                    id="expenseDate" 
+                                                    formControlName="expenseDate"/>
+                                                   
+                
+                                                    @if (validateField('expenseDate', 'required')){
+                                                        <small id="expenseDate-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                                    }
+                                        </div>
+                                    </div>
+                                      
+
+                                    <div class="details-form__row ">
+                                        <div  class='details-form__form-field' >
+                                                <label for="maxDate" class="details-form__form-field__label" >Fecha máxima para saldar cuentas</label>
+                                                <p-calendar 
+                                                    class="details-form__form-field__input"  
+                                                    id="maxDate" 
+                                                    formControlName="maxDate"/>
+                                                   
+                
+                                                    @if (validateField('maxDate', 'required')){
+                                                        <small id="maxDate-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                                    }
+                                        </div>
+                                    </div>
+
+                                    
+                                    <div class="details-form__row ">
+                                        <div  class='details-form__form-field' >
+                                                <label for="expenseStatus" class="details-form__form-field__label" >Estado del gasto</label>
+                                                <input 
+                                                    pInputText class="details-form__form-field__input"  
+                                                    id="expenseStatus" 
+                                                    formControlName="expenseStatus"/>
+                                                   
+                
+                                                    @if (validateField('expenseStatus', 'required')){
+                                                        <small id="expenseStatus-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                                    }
+                                        </div>
+                                    </div>
+
+
                                    
                                 </div>             
                                               
@@ -63,13 +131,13 @@
                         
                         <div class="flex pt-4 justify-content-end">
                             <p-button 
-                                label="Agregar/Modificar participantes" [text]="true" (onClick)="nextCallback.emit()" />
+                                label="Repartir el gasto" [text]="true" (onClick)="nextCallback.emit()" />
 
                              
                         </div>
                     </ng-template>
                 </p-stepperPanel>
-                <p-stepperPanel header="Participantes">
+                <p-stepperPanel header="Repartición del gasto">
                     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" let-index="index">
                         <div class="flex flex-column h-12rem">
                             <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
@@ -79,33 +147,17 @@
                                         <div  class='details-form__form-field ' >
                                                 <label class="details-form__form-field__label" >Listado de participantes</label>
                                                 <div class="flex flex-column align-items-center justify-content-center scrollable">
-                                                    <p-tree 
+                                                    <!--p-tree 
                                                         [value]="participants" 
                                                         selectionMode="checkbox" 
                                                         class="w-full md:w-30rem" 
-                                                        [(selection)]="selectedParticipants" />
+                                                        [(selection)]="selectedParticipants" /-->
                                                 </div>
                                                 
                                         </div>
                                     </div>
 
-                                    
-                                    <input type="text" pInputText id="inviteEmail" formControlName="inviteEmail"  />
-
-                                    @if ( emailEmpty()){
-                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="true" />
-                                    }@else if (validateField('inviteEmail', 'pattern')){
-                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
-                                            * Formato inválido
-                                        </small>
-                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="true" />
-                                    }@else {
-                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="false" />
-                                    }
-                               
                                 
-
-
                             </div>
                         </div>
                         <div class="flex pt-4 justify-content-between">
@@ -114,13 +166,13 @@
                                 
                                 (onClick)="prevCallback.emit()" />
                             <p-button  [text]="true"
-                                label="Agregar/Modificar imagen" 
+                                label="Agregar imagen comprobante" 
                                
                                 (onClick)="nextCallback.emit()" />
                         </div>
                     </ng-template>
                 </p-stepperPanel>
-                <p-stepperPanel header="Imagen de grupo">
+                <p-stepperPanel header="Ticket o comprobante">
                     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
                         <div class="flex flex-column h-12rem">
                             <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
@@ -159,3 +211,4 @@
         </form>
     </div>
 </div>
+

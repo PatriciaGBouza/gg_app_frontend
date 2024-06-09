@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { MatButtonModule} from '@angular/material/button';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUploadEvent, FileUploadModule } from 'primeng/fileupload';
 import { TableModule } from 'primeng/table';
 import { GroupsService } from '../../services/groups.service';
 import { IUser } from '../../interfaces/iuser.interface';
@@ -14,6 +14,7 @@ import { GroupParticipantsService } from '../../services/group-participants.serv
 import { TreeModule } from 'primeng/tree';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+
 
 
 @Component({
@@ -31,6 +32,7 @@ export class GroupFormComponent {
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
 
+  parent: string = '';
 
   groupsService = inject(GroupsService);
   participantsService = inject(GroupParticipantsService);
@@ -50,6 +52,8 @@ export class GroupFormComponent {
   selectedParticipants!: TreeNode[];
 
   invitationsCount=0;
+
+  uploadedFiles: any[] = [];
 
 
    /*
@@ -77,17 +81,31 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       },
       []
     );
-   
       this.isEmptyForm = true;
-      this.initParticipants(this.user);
-      this.selectedParticipants=[];
-      this.invitationsCount=0;
+ 
       this.messageService=messageService;
       
   }
   
 
   ngOnInit(){
+
+    this.activatedRoute.queryParamMap.subscribe((paramMap) => {
+      // read param from paramMap
+      // TO-DO: TRY TO CHANGE THIS AND REPLACE WITH STATES, also in expense form
+      const paramValue = paramMap.get('parent');
+      console.log('parent '+ paramValue);
+      // use parameter...
+
+
+      this.participants = this.participantsService.getAllAvailableParticipants(this.user);
+      this.selectedParticipants=[];
+      this.invitationsCount=0;
+
+    });
+
+    
+
     this.activatedRoute.params.subscribe((params: any) => {
       let selectedId = params.id;
       //console.log(" ngOnInit with id "+ selectedId);
@@ -149,11 +167,6 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
   }
  
       
- initParticipants(aUser:IUser): void{
-  this.participants = this.participantsService.getAllAvailableParticipants(aUser);
-  
- }
-
  preselectParticipants(keys: string[]){
   console.log('Preselect participants ' +keys);
   this.preselectNodes(keys,this.participants);
@@ -201,7 +214,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
   
 
   saveFormData(): void {
-    
+  
    if (this.modelForm.value.id) {
       console.log(' saveFormData update');
       //update
@@ -214,7 +227,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
           */
           if (aGroup.id) {
             this.messageService.add(
-              { severity: 'success', summary: 'Group actualizado correctamente', detail: 'Grupo ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' actualizado correctamente' , key: 'br', life: 3000  }
+              { severity: 'success', summary: 'Grupo actualizado correctamente', detail: 'Grupo ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' actualizado correctamente' , key: 'br', life: 3000  }
             );
           
             this.modelForm.reset();
@@ -236,11 +249,11 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
 
           if (aGroup.id) {
             this.messageService.add(
-              { severity: 'success', summary: 'Group creado correctamente', detail: 'Nuevo group ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' creado correctamente' , key: 'br', life: 3000 }
+              { severity: 'success', summary: 'Grupo creado correctamente', detail: 'Nuevo grupo ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' creado correctamente' , key: 'br', life: 3000 }
             );
             
             this.modelForm.reset();
-            this.router.navigate( [ '/editgroup', aGroup.id ] );
+            this.router.navigate(['/groups']);
           } else {
             this.messages.push(
               { severity: 'error', summary: 'Error durante la creación', detail: 'Por favor, contacte con el administrador' }
@@ -277,7 +290,14 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
  }
 
 
- 
+ onUpload(event:FileUploadEvent) {
+  for(let file of event.files) {
+      this.uploadedFiles.push(file);
+  }
+
+  this.messageService.add({severity: 'info', summary: 'Fichero subido', detail: ''});
+}
+
  showBottomRight() {
   this.messageService.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', key: 'br', life: 3000 });
 }

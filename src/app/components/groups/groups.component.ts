@@ -25,8 +25,8 @@ export class GroupsComponent {
   user: IUser={ id: 1};
 
   ngOnInit(){
-      this.groupsInfo=this.groupsService.getAllGroupsByUser(this.user);
-    console.log(this.groupsInfo);
+    this.groupsInfo=this.groupsService.getAllGroupsByUser(this.user);
+    //console.log(this.groupsInfo);
   }
 
  /* ngOnInit() {

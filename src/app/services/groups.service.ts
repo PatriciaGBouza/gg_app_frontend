@@ -34,6 +34,7 @@ export class GroupsService {
     this.lastId++;
     aGroup.id=this.lastId;
     aGroup.createdBy=aUser.id;
+    aGroup.createdOn=new Date();
     aGroup.participants=participants;
     this.arrGroups.push(aGroup);
     return aGroup;

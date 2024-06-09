@@ -5,10 +5,11 @@ export interface IExpense {
     group:IGroup;
     concept: string;
     amount: number;
+    paidBy: number;
     createdBy: number;
-    date: number;
-    maxDate:number;
+    expenseDate: Date;
+    maxDate:Date;
     image: string;
-    createdOn: number;
-    status:string;
+    createdOn: Date;
+    expenseStatus:string;
 }
