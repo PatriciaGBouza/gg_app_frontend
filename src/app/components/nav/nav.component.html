@@ -1,28 +1,26 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" routerLinkActive="active" [routerLink]="['/']">
+    <mat-icon>home</mat-icon>
+  </button>
+  <span>GG App</span>
+  <span class="example-spacer"></span>
 
+  <button mat-button routerLinkActive="active" [routerLink]="['/expenses']">Gastos</button>
+  <button mat-button routerLinkActive="active" [routerLink]="['/balance']">Balance</button>
+  <button mat-button routerLinkActive="active" [routerLink]="['/groups']">Grupos</button>
+  <button mat-icon-button>
+    <mat-icon svgIcon="bell"></mat-icon>
+  </button>
+  <button mat-icon-button routerLinkActive="active" [routerLink]="['/settings']">
+    <mat-icon svgIcon="settings" class="icon"></mat-icon>
+  </button>
+  <button mat-button (click)="logout()">Logout</button>
+</mat-toolbar>
 
-  <mat-toolbar color="primary">
-    <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" routerLinkActive="active" [routerLink]="['/']">
-      <mat-icon>home</mat-icon>
-    </button>
-    <span>GG App</span>
-    <span class="example-spacer"></span>
-
-      <button mat-button routerLinkActive="active" [routerLink]="['/expenses']">Gastos</button>
-      <button mat-button routerLinkActive="active" [routerLink]="['/balance']">Balance</button>
-      <button mat-button routerLinkActive="active" [routerLink]="['/groups']">Grupos</button>
-      <button mat-icon-button >
-        <mat-icon svgIcon="bell" ></mat-icon>
-      </button>   
-      <button mat-icon-button >
-        <mat-icon svgIcon="settings"  class="icon"></mat-icon>
-      </button>
-      <button mat-button (click)="logout()">Logout</button>
 <!--
       <button mat-button [routerLink]="['/sign-in']">Sign In</button>
       <button mat-button [routerLink]="['/sign-up']">Sign Up</button>
 -->
 
-   
-  </mat-toolbar>
 
   

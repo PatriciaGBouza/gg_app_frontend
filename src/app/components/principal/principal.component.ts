@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { NavComponent } from '../nav/nav.component';
 
 @Component({
   selector: 'app-principal',
   standalone: true,
-  imports: [NavComponent],
+  imports: [],
   templateUrl: './principal.component.html',
   styleUrl: './principal.component.css'
 })

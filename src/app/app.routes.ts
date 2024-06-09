@@ -9,6 +9,7 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { PrincipalComponent } from './components/principal/principal.component';
 import { authGuard } from './guards/auth.guard';
 import { nonAuthGuard } from './guards/non-auth.guard';
+import { UserSettingsComponent} from './components/usersettings/usersettings.component';
 
 export const routes: Routes = [
 { path: '', pathMatch: 'full', component: PrincipalComponent },
@@ -20,5 +21,6 @@ export const routes: Routes = [
 { path: 'balance', component: BalanceComponent, canActivate: [authGuard] },
 { path: 'sign-in', component: SignInComponent, canActivate: [nonAuthGuard] },
 { path: 'sign-up', component: SignUpComponent, canActivate: [nonAuthGuard] },
+{ path: 'settings', component: UserSettingsComponent, canActivate: [authGuard] },
 { path: '**', redirectTo: '' }
 ];
