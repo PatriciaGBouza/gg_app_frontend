@@ -22,8 +22,8 @@ export const routes: Routes = [
 { path: 'newexpense', component: ExpenseFormComponent,canActivate: [authGuard]},
 { path: 'editexpense/:id', component: ExpenseFormComponent,canActivate: [authGuard]},
 { path: 'balance', component: BalanceComponent, canActivate: [authGuard] },
-{ path: 'sign-in', component: SignInComponent, canActivate: [nonAuthGuard] },
-{ path: 'sign-up', component: SignUpComponent, canActivate: [nonAuthGuard] },
+{ path: 'login', component: SignInComponent, canActivate: [nonAuthGuard] },
+{ path: 'register', component: SignUpComponent, canActivate: [nonAuthGuard] },
 { path: 'settings', component: UserSettingsComponent, canActivate: [authGuard] },
 { path: '**', redirectTo: '' }
 ];
