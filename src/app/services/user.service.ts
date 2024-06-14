@@ -1,47 +1,40 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-import { AuthService } from './auth.service';
+import { IApiResponse } from '../interfaces/iapi-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private baseUrl = `${environment.apiURL}/auth/users`;
+  private baseUrl = `${environment.apiURL}/users`;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('x-access-token', token);
-    } else {
-      // Handle the case where the token is null, e.g., redirect to login
-      console.error('No token found, redirecting to login.');
-      // Optionally, you can handle the redirection here
-    }
-    return headers;
+  getUserFromLocalStorage(): any {
+    const userData = localStorage.getItem('currentUser');
+    return userData ? JSON.parse(userData) : null;
   }
 
-  getUser(userId: string): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.get(`${this.baseUrl}/${userId}`, { headers });
+  getUserName(): string | null {
+    const user = this.getUserFromLocalStorage();
+    return user ? user.name : null; 
   }
 
-  getUserByEmail(email: string): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.get(`${this.baseUrl}/email/${email}`, { headers });
+  getUserById(userId: string): Observable<IApiResponse<any>> {
+    return this.http.get<IApiResponse<any>>(`${this.baseUrl}/${userId}`);
   }
 
-  updateUser(user: any): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.put(`${this.baseUrl}/${user.id}`, user, { headers });
+  getUserByEmail(email: string): Observable<IApiResponse<any>> {
+    return this.http.get<IApiResponse<any>>(`${this.baseUrl}/email/${email}`);
   }
 
-  deleteUser(userId: string): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.delete(`${this.baseUrl}/${userId}`, { headers });
+  updateUser(user: any): Observable<IApiResponse<any>> {
+    return this.http.put<IApiResponse<any>>(`${this.baseUrl}/${user.id}`, user);
+  }
+
+  deleteUser(userId: string): Observable<IApiResponse<any>> {
+    return this.http.delete<IApiResponse<any>>(`${this.baseUrl}/${userId}`);
   }
 }

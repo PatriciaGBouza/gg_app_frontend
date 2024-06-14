@@ -1,18 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
-import { provideRouter } from '@angular/router';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes';
-import { AuthService } from './app/services/auth.service';
-import { UserService } from './app/services/user.service';
 
 bootstrapApplication(AppComponent, {
-  providers: [
-    provideRouter(routes),
-    AuthService,
-    UserService,
-    provideHttpClient(),
-    ...appConfig.providers
-  ]
+  providers: [...appConfig.providers]
 }).catch((err) => console.error(err));

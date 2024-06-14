@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
+import { catchError, map, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-sign-in',
@@ -44,23 +46,23 @@ export class SignInComponent implements OnInit {
 
   onSubmit(): void {
     if (this.signInForm.valid) {
-      this.authService.login(this.signInForm.value).subscribe(
-        response => {
-          this.authService.saveToken(response.accessToken);
+      this.authService.login(this.signInForm.value).pipe(
+        tap(response => {
           this.snackBar.open('Login successful!', 'Close', {
             duration: 3000,
             panelClass: ['snackbar-success']
           });
           this.router.navigate(['/home']);
-        },
-        error => {
+        }),
+        catchError(error => {
           this.snackBar.open('Invalid email or password', 'Close', {
             duration: 3000,
             panelClass: ['snackbar-error']
           });
           this.error = 'Invalid email or password';
-        }
-      );
+          return of(null);
+        })
+      ).subscribe();
     }
   }
 }

@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -47,13 +47,13 @@ export class SignUpComponent implements OnInit {
           this.successMessage = 'User registered successfully';
           console.log(this.successMessage, response);
           setTimeout(() => {
-            this.router.navigate(['/sign-in']);
+            this.router.navigate(['/login']);
           }, 3000); // Redirect to sign-in after 3 seconds
         }),
         catchError(error => {
           this.errorMessage = 'Registration failed. Please try again.';
           console.error(this.errorMessage, error);
-          return of(error);
+          return of(null); // Return null to keep the observable stream intact
         })
       ).subscribe();
     }
