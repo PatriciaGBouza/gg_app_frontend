@@ -1,4 +1,5 @@
-import { IParticipant } from "../interfaces/iparticipant.interface";
+import { IExpenseParticipant } from "../interfaces/iexpense.interface";
+
 
 
 
@@ -50,4 +51,37 @@ export const PARTICIPANTS_TREEDATA: any [] = [
         ]
     }
     
+ ];
+
+ export const PARTICIPANTS_INAGRUP: IExpenseParticipant [] = [
+    { 
+        
+        idParticipant: 53,
+        participantName: 'Leonor Ayala',
+        participantImage:'',
+        percentage: 0.25,
+        amount:0
+    },
+    { 
+        idParticipant: 54,
+        participantName: 'Marina Garcia',
+        participantImage:'',
+        percentage: 0.25,
+        amount:0
+      
+    },
+    { 
+        idParticipant: 56,
+        participantName: 'Pedro Lopez',
+        participantImage:'',
+        percentage: 0.25,
+        amount:0
+    },
+    { 
+        idParticipant: 57,
+        participantName: 'Carlos Garcia',
+        participantImage:'',
+        percentage: 0.25,
+        amount:0
+    }
  ];
