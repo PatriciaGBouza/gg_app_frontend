@@ -11,6 +11,7 @@
           <hr class="section-divider" />
 
           <div>
+            <!-- Image Error Message -->
             @if (imageError) {
               <div class="error-message">{{ imageError }}</div>
             }
@@ -18,6 +19,7 @@
               <img [src]="croppedImage || settingsForm.get('image_url')?.value" alt="Imagen del Usuario" class="user-image"/>
             }
 
+            <!-- Image URL Field -->
             <mat-form-field appearance="fill">
               <mat-label>URL de la Imagen</mat-label>
               @if (editField !== 'image_url') {
@@ -44,6 +46,7 @@
             }
           </div>
 
+          <!-- Name Field -->
           <div>
             <mat-form-field appearance="fill">
               <mat-label>Nombre</mat-label>
@@ -58,6 +61,7 @@
             </mat-form-field>
           </div>
 
+          <!-- Email Field -->
           <div>
             <mat-form-field appearance="fill">
               <mat-label>Email</mat-label>
@@ -72,6 +76,7 @@
             </mat-form-field>
           </div>
 
+          <!-- Password Field -->
           <div>
             <mat-form-field appearance="fill">
               <mat-label>Contraseña</mat-label>
