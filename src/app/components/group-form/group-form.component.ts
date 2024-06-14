@@ -96,15 +96,11 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       const paramValue = paramMap.get('parent');
       console.log('parent '+ paramValue);
       // use parameter...
+     });
 
-
-      this.participants = this.participantsService.getAllAvailableParticipants(this.user);
-      this.selectedParticipants=[];
-      this.invitationsCount=0;
-
-    });
-
-    
+    this.participants = this.participantsService.getAllAvailableParticipants(this.user);
+    this.selectedParticipants=[];
+    this.invitationsCount=0;
 
     this.activatedRoute.params.subscribe((params: any) => {
       let selectedId = params.id;

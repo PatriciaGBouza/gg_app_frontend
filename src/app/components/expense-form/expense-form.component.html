@@ -15,7 +15,7 @@
                 
                 <p-stepperPanel header="Datos básicos" >
                     <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
-                        <div class="flex flex-column h-12rem">
+                        <div class="flex flex-column h-12rem " >
                             <div class="border-1 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
                                 
                                 <div class="container">
@@ -139,25 +139,31 @@
                 </p-stepperPanel>
                 <p-stepperPanel header="Repartición del gasto">
                     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" let-index="index">
-                        <div class="flex flex-column h-12rem">
+                        <div class="flex flex-column h-12rem" >
                             <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
                              
                               
-                                    <div class="details-form__row ">
+                                    <div class="details-form__row">
                                         <div  class='details-form__form-field ' >
                                                 <label class="details-form__form-field__label" >Listado de participantes</label>
-                                                <div class="flex flex-column align-items-center justify-content-center scrollable">
-                                                    <!--p-tree 
-                                                        [value]="participants" 
-                                                        selectionMode="checkbox" 
-                                                        class="w-full md:w-30rem" 
-                                                        [(selection)]="selectedParticipants" /-->
+                                                <div class="scrollable" formArrayName="participants">
+                                                  
+                                                    @for (participant of participants.controls; track participant) {
+                                                        <div [formGroupName]="$index">
+                                                            <label for="participantName" class="details-form__form-field__label" >Nombre: {{participant.get('participantName')?.value}}</label>
+                                                            <div class="details-form__form-field__subfieldSet ">
+                                                                <div class="details-form__form-field__subfields"></div>
+                                                                <div class="details-form__form-field__subfields"><label for="percentage" class="details-form__form-field__label" >Porcentage</label> <input  pInputText class="details-form__form-field__input"  id="percentage" formControlName="percentage" /></div>
+                                                                <div class="details-form__form-field__subfields"><label for="amount" class="details-form__form-field__label" >Cantidad</label> <input pInputText  class="details-form__form-field__input"  id="amount"  formControlName="amount" /></div>
+                                                                <div class="details-form__form-field__subfields"><label for="participantExpenseStatus" class="details-form__form-field__label" >Estado del gasto</label> <input pInputText class="details-form__form-field__input"  id="expenseStatus"  formControlName="expenseStatus" /></div>
+                                                            </div>
+                                                        </div>
+                                                        }
                                                 </div>
-                                                
+                                                   
                                         </div>
                                     </div>
 
-                                
                             </div>
                         </div>
                         <div class="flex pt-4 justify-content-between">
@@ -174,7 +180,7 @@
                 </p-stepperPanel>
                 <p-stepperPanel header="Ticket o comprobante">
                     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
-                        <div class="flex flex-column h-12rem">
+                        <div class="flex flex-column h-12rem" >
                             <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
                                 <p-fileUpload 
                                     name="demo[]" 
