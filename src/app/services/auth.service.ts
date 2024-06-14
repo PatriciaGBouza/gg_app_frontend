@@ -15,7 +15,11 @@ export class AuthService {
     // Load user data from local storage on service initialization
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      this.currentUser = JSON.parse(storedUser);
+      try {
+        this.currentUser = JSON.parse(storedUser);
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+      }
     }
   }
 
@@ -27,15 +31,20 @@ export class AuthService {
     return new Observable(observer => {
       this.http.post(`${this.baseUrl}/login`, credentials).subscribe(
         (response: any) => {
-          this.saveToken(response.accessToken);
-          this.currentUser = response.user;
-          localStorage.setItem('currentUser', JSON.stringify(response.user)); // Store user data in local storage
-          console.log('Login response:', response); // Log the entire response
-          console.log('Logged in user data:', this.currentUser); // Log user data
-          console.log('Access token:', response.accessToken); // Log access token
-          this.router.navigate(['/home']);
-          observer.next(response);
-          observer.complete();
+          try {
+            this.saveToken(response.accessToken);
+            this.currentUser = response.user;
+            localStorage.setItem('currentUser', JSON.stringify(response.user)); // Store user data in local storage
+            console.log('Login response:', response); // Log the entire response
+            console.log('Logged in user data:', this.currentUser); // Log user data
+            console.log('Access token:', response.accessToken); // Log access token
+            this.router.navigate(['/home']);
+            observer.next(response);
+            observer.complete();
+          } catch (error) {
+            console.error('Error processing login response:', error);
+            observer.error(error);
+          }
         },
         (error: any) => {
           console.error('Login error:', error);
@@ -47,7 +56,15 @@ export class AuthService {
 
   getUser(): any {
     if (!this.currentUser) {
-      this.currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        try {
+          this.currentUser = JSON.parse(storedUser);
+        } catch (error) {
+          console.error('Error parsing stored user data:', error);
+          this.currentUser = null;
+        }
+      }
     }
     return this.currentUser; // Return the saved user details
   }
