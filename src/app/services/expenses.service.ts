@@ -1,13 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { IExpense } from '../interfaces/iexpense.interface';
 import { IUser } from '../interfaces/iuser.interface';
 import { EXPENSES } from '../db/expense.db';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExpensesService {
+  private httpClient = inject(HttpClient);
+  private url = `${environment.apiURL}/expenses`;
 
   private arrExpenses: IExpense[]= EXPENSES;
   private lastId:number=2;
@@ -46,6 +50,33 @@ export class ExpensesService {
   delete (id: number){
 
   }
+
+  /* desde API
+  getAllExpensesByGroup(idGroup: number): Observable<IApiResponse<IExpense[]>> {
+    return this.httpClient.get<IApiResponse<IExpense[]>>(`${this.url}/group/${idGroup}`);
+  }
+
+  getAllExpensesWithinUserGroups(idUser: number): Observable<IApiResponse<IExpense[]>> {
+    return this.httpClient.get<IApiResponse<IExpense[]>>(`${this.url}/users/${idUser}`);
+  }
+
+  getById(id: number): Observable<IApiResponse<IExpense>> {
+    return this.httpClient.get<IApiResponse<IExpense>>(`${this.url}/${id}`);
+  }
+
+  insert(expense: IExpense): Observable<IApiResponse<IExpense>> {
+    return this.httpClient.post<IApiResponse<IExpense>>(this.url, expense);
+  }
+    update(expense: IExpense): Observable<IApiResponse<IExpense>> {
+    return this.httpClient.put<IApiResponse<IExpense>>(`${this.url}/${expense.id}`, expense);
+  }
+
+  delete(id: number): Observable<IApiResponse<any>> {
+    return this.httpClient.delete<IApiResponse<any>>(`${this.url}/${id}`);
+  }
+
+  
+  */
 
 
 
