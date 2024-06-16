@@ -11,13 +11,3 @@ export interface IGroup {
     
 }
 
-export interface IExistingGroup {
-    id: number;
-    name: string;
-    description: string;
-    createdBy: number;
-    image: string;
-    createdOn: Date;
-    participants?: IParticipant[];
-    
-}

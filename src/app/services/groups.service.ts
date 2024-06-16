@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IExistingGroup, IGroup } from '../interfaces/igroup.interface';
+import { IGroup } from '../interfaces/igroup.interface';
 import { GROUPS } from '../db/groups.db';
 import { IUser } from '../interfaces/iuser.interface';
 import { IParticipant } from '../interfaces/iparticipant.interface';
@@ -17,7 +17,7 @@ export class GroupsService {
   private url = `${environment.apiURL}/groups`;
 
 // hasta API ready
-  private arrGroups: IExistingGroup[] = GROUPS
+  private arrGroups: IGroup[] = GROUPS
   private lastId:number=5;
 
   constructor() { }
