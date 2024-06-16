@@ -94,7 +94,6 @@ export class ExpenseFormComponent {
  
 
   ngOnInit(){
-
       
     this.activatedRoute.queryParamMap.subscribe((paramMap) => {
       // read param from paramMap
@@ -128,54 +127,54 @@ export class ExpenseFormComponent {
         } 
         else{
 
-          //GET DATOS DE GASTO
-          const aExpense =this.expensesService.getById(Number.parseInt(selectedId));
-          console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
+            //GET DATOS DE GASTO
+            const aExpense =this.expensesService.getById(Number.parseInt(selectedId));
+            console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
 
-          if (aExpense && aExpense.id){
-            this.isEmptyForm = false;
-            this.modelForm = new FormGroup({
-                id: new FormControl(aExpense.id, []),
-                group: new FormControl(aExpense.group,[]),
-                concept: new FormControl(aExpense.concept, [Validators.required,Validators.minLength(3), Validators.maxLength(255)]),
-                amount: new FormControl(aExpense.amount, [Validators.required, Validators.min(1), Validators.max(100000)]),
-                paidBy: new FormControl(aExpense.paidBy, []),
-                expenseDate: new FormControl(aExpense.expenseDate, []), 
-                maxDate: new FormControl(aExpense.maxDate, []), 
-                expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
-                participants: new FormArray([new FormGroup({
-                  participantName: new FormControl(null, [Validators.required]),
-                  percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
-                  amount: new FormControl(null, [Validators.required]),
-                  expenseStatus: new FormControl(null, [])
-                })
-                ]) 
-            },{
-              validators: [Validation.completenessOnPercetages('participants', 'percentage')]
-            });
+            if (aExpense && aExpense.id){
+                  this.isEmptyForm = false;
+                  this.modelForm = new FormGroup({
+                      id: new FormControl(aExpense.id, []),
+                      group: new FormControl(aExpense.group,[]),
+                      concept: new FormControl(aExpense.concept, [Validators.required,Validators.minLength(3), Validators.maxLength(255)]),
+                      amount: new FormControl(aExpense.amount, [Validators.required, Validators.min(1), Validators.max(100000)]),
+                      paidBy: new FormControl(aExpense.paidBy, []),
+                      expenseDate: new FormControl(aExpense.expenseDate, []), 
+                      maxDate: new FormControl(aExpense.maxDate, []), 
+                      expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
+                      participants: new FormArray([new FormGroup({
+                        participantName: new FormControl(null, [Validators.required]),
+                        percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
+                        amount: new FormControl(null, [Validators.required]),
+                        expenseStatus: new FormControl(null, [])
+                      })
+                      ]) 
+                  },{
+                    validators: [Validation.completenessOnPercetages('participants', 'percentage')]
+                  });
 
-            //INICIALIZAMOS OPTIONS DE PAID bY DROPDOWN
-            const arr= this.groupsService.getAllParticipantsWithinAGroup(this.user, aExpense.group);
-            if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
+                  //INICIALIZAMOS OPTIONS DE PAID bY DROPDOWN
+                  const arr= this.groupsService.getAllParticipantsWithinAGroup(this.user, aExpense.group);
+                  if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
 
 
-            //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
-            this.updateParticipantsOnForm(aExpense);
+                  //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
+                  this.updateParticipantsOnForm(aExpense);
 
-            console.log(" ngOnInit edit expense with num participants" + this.participants.length);
-            console.log(" ngOnInit edit modelForm "+ this.modelForm);
-          
-          }else{
-            this.messages.push(
-              { severity: 'error', summary: 'Error cargando datos de gasto', detail: 'Por favor, contacte con el administrador' }
-            );
-          }
+                  console.log(" ngOnInit edit expense with num participants" + this.participants.length);
+                  console.log(" ngOnInit edit modelForm "+ this.modelForm);
+                
+              }else{
+                  this.messages.push(
+                    { severity: 'error', summary: 'Error cargando datos de gasto', detail: 'Por favor, contacte con el administrador' }
+                  );
+              }
 
-            /* 
-              /* cuando API ready
-            TODO
-              });*/
-       }
+              /* 
+                /* cuando API ready
+              TODO
+                });*/
+            }
       }else{
 
         /* EN EL CASO DE NUEVO GASTO, EL FORM YA ESTÁ CREADO EN EL CONSTRUCTOR */

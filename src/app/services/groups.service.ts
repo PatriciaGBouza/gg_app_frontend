@@ -25,6 +25,8 @@ export class GroupsService {
   /* Devuelve los grupos creados por un usuario*/
   getAllGroupsByUser(aUser:IUser):  Observable<IGroup[]> {
     return this.httpClient.get<IGroup[]>(`${this.url}/creator/${aUser.id}`);
+    //return this.httpClient.get<IApiResponse<IGroup[]>>(`${this.url}/creator/${creatorId}`);
+
     //return this.arrGroups.filter(group => group.createdBy === aUser.id);
   }
 
