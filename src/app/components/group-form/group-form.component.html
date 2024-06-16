@@ -32,9 +32,19 @@
                                                         <small id="name-help"  class="details-form__form-field__smalllabel error">
                                                             * Obligatorio
                                                         </small>
-                                               
                                                     }
-                                        </div>
+                                                    @if (validateField('name', 'minlength')) {
+                                                        <small id="name-help"  class="details-form__form-field__smalllabel error">
+                                                            * Longitud mínima: 3 carácteres
+                                                        </small>
+                                                    }
+                                                    @if (validateField('name', 'maxlength')) {
+                                                        <small id="name-help"  class="details-form__form-field__smalllabel error">
+                                                            * Longitud máxima: 255 carácteres
+                                                        </small>
+                                                    }                     
+                                                
+                                            </div>
                                     </div>
                                 
                                     <div class="details-form__row ">
@@ -51,6 +61,16 @@
                                                             * Obligatorio
                                                         </small>
                                                     }
+                                                    @if (validateField('description', 'minlength')) {
+                                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
+                                                            * Longitud mínima: 3 carácteres
+                                                        </small>
+                                                    }
+                                                    @if (validateField('description', 'maxlength')) {
+                                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
+                                                            * Longitud máxima: 255 carácteres
+                                                        </small>
+                                                    }   
                                         </div>
                                     </div>
                                       
@@ -83,7 +103,8 @@
                                                         [value]="participants" 
                                                         selectionMode="checkbox" 
                                                         class="w-full md:w-30rem" 
-                                                        [(selection)]="selectedParticipants" />
+                                                        [(selection)]="selectedParticipants" 
+                                                       />
                                                 </div>
                                                 
                                         </div>

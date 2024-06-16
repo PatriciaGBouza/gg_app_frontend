@@ -42,6 +42,7 @@
     flex-grow: 1;
   }
 
+  
 .details-form__form-field__label{
       font-size: 1rem;
       display: block;
@@ -57,6 +58,11 @@
       font-size: 1rem;
       width: 100%;
  }
+
+ .details-form__form-field__smallinput{
+  font-size: 1rem;
+  width:100px;
+}
 
  .list-table{
     background: white;

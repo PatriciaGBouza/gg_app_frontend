@@ -1,9 +1,19 @@
-import { IExpenseParticipant } from "../interfaces/iexpense.interface";
+import { IParticipant } from "../interfaces/iparticipant.interface";
+
+export const PARTICIPANTS_CONTACTSOFAUSER: IParticipant [] = [
+    {id: 53,
+       name: 'Leonor Ayala', image: ''},
+       {id: 54,
+       name: 'Marina Garcia', image: ''},
+       {id: 56,
+       name: 'Pedro Lopez', image: ''},
+       {id: 57,
+       name: 'Carlos Garcia', image: ''},
+       {id: 58,
+        name: 'Emilio Fernandez', image: ''} ]
 
 
-
-
-export const PARTICIPANTS_TREEDATA: any [] = [
+ export const PARTICIPANTS_TREEDATA: any [] = [
     {
          key: '53',
          label: 'Leonor Ayala',
@@ -53,35 +63,15 @@ export const PARTICIPANTS_TREEDATA: any [] = [
     
  ];
 
- export const PARTICIPANTS_INAGRUP: IExpenseParticipant [] = [
-    { 
-        
-        idParticipant: 53,
-        participantName: 'Leonor Ayala',
-        participantImage:'',
-        percentage: 0.25,
-        amount:0
-    },
-    { 
-        idParticipant: 54,
-        participantName: 'Marina Garcia',
-        participantImage:'',
-        percentage: 0.25,
-        amount:0
-      
-    },
-    { 
-        idParticipant: 56,
-        participantName: 'Pedro Lopez',
-        participantImage:'',
-        percentage: 0.25,
-        amount:0
-    },
-    { 
-        idParticipant: 57,
-        participantName: 'Carlos Garcia',
-        participantImage:'',
-        percentage: 0.25,
-        amount:0
-    }
- ];
+
+ export const PARTICIPANTS_INAGROUP: IParticipant [] = [
+ {id: 53,
+    name: 'Leonor Ayala', image: ''},
+    {id: 54,
+    name: 'Marina Garcia', image: ''},
+    {id: 56,
+    name: 'Pedro Lopez', image: ''},
+    {id: 57,
+    name: 'Carlos Garcia', image: ''}
+    ]
+ 

@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { IParticipant } from '../interfaces/iparticipant.interface';
-import { PARTICIPANTS_INAGRUP, PARTICIPANTS_TREEDATA } from '../db/participants.db';
+import { PARTICIPANTS_INAGROUP, PARTICIPANTS_CONTACTSOFAUSER } from '../db/participants.db';
 import { IUser } from '../interfaces/iuser.interface';
-import { IGroup } from '../interfaces/igroup.interface';
+import { IExistingGroup, IGroup } from '../interfaces/igroup.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class GroupParticipantsService {
   private url="https://localhost/api/groups";
 
 // hasta API ready
-  private arrParticipants: IParticipant[] = PARTICIPANTS_TREEDATA;
+  private arrParticipants: IParticipant[] = PARTICIPANTS_CONTACTSOFAUSER;
   private lastId:number=5;
 
  
@@ -22,21 +22,20 @@ export class GroupParticipantsService {
 
   constructor() { }
 
-  /* Get all available participants for a user, the ones within the user groups */
-  getAllAvailableParticipants(aUser:IUser): any[] {
-    return PARTICIPANTS_TREEDATA;
+  /* Devuelve todos los participantes que comparten grupo con el usuario que se le pasa por parámetro*/
+  getAllAvailableParticipants(aUser:IUser): IParticipant[] {
+    return PARTICIPANTS_CONTACTSOFAUSER;
   }
-
-  getAllParticipantsWithinAGroup(aUser:IUser): any[] {
-    return PARTICIPANTS_INAGRUP;
-  }
-
-  
+ 
   getAllAvailableParticipantsTreeNode(aUser:IUser) {
     return Promise.resolve(this.getAllAvailableParticipants(aUser));
   }
 
-    
+  
+  getAllParticipantsWithinAGroup(aUser:IUser, aGroup:IGroup): IParticipant[]{
+    return PARTICIPANTS_INAGROUP;
+
+  }
 
 
 }

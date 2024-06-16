@@ -19,17 +19,26 @@ export class ExpensesService {
     return this.arrExpenses.filter(expense => expense.group.id === idGroup);
   }
 
-  /* TO-DO: Devuelve la lista de gastos de los grupos a los que pertenece un usuario.*/
-  /* ahora no filtra*/
+  /* Devuelve toda la lista de gastos de los grupos a los que pertenece un usuario.*/
+  /* Usado desde pantalla de listado de gastos */
   getAllExpensesWithinUserGroups(idUser: IUser){
     return this.arrExpenses;
   }
 
+  /* Devuelve toda la lista de gastos de un grupo al que pertenece un usuario */
+
+  getAllExpensesWithinUserGroupsFilteredByGroup(idUser: IUser, idGroup:number):IExpense[]{
+    return this.arrExpenses.filter(({group}) => group.id === idGroup);
+  }
+
+  /* Devuelve un gasto concreto */
+  /* Usado desde el formulario de gasto*/
   getById(id_param: number):IExpense|undefined {
     return this.arrExpenses.find(({id}) => id === id_param);
   }
 
 
+  
   insert(aExpense:IExpense, aUser:IUser): IExpense{
     this.lastId++;
     aExpense.id=this.lastId;

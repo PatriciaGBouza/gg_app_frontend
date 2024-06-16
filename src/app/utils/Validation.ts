@@ -12,9 +12,8 @@ export default class Validation {
         console.log('completenessOnPercetages validation suming: '+percentage);
         percentagesSum+=Number.parseFloat(percentage);
       }
-      let t= Math.round(percentagesSum * 100) / 100;
-      console.log('ERROR ON completenessOnPercetages validation for total value: '+t)
-      if (t != 1) {
+      
+     if (percentagesSum != 100) {
         
         console.log('before: ' +formArray.parent);
         
@@ -30,6 +29,22 @@ export default class Validation {
     }
   }
 
+  static noNaNValidator: ValidatorFn = (
+    control: AbstractControl<number | null>,
+  ) => {
+    const value = control.value
+  
+    if (Number.isNaN(value)) {
+      // Value is null and not NaN, so this is never reached because Number.isNaN(null) is false,
+      // the control (and group) is marked valid and the submit button is not disabled
+      return {
+        invalidValue: {
+          value: value
+        },
+      }
+    }
+    return null
+  }
   
 }
 

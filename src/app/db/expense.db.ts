@@ -14,8 +14,16 @@ export const EXPENSES: IExpense [] = [{
             createdBy: 1,
             image: "https://placehold.co/200x200",
             createdOn: new Date(),
-            participants: [ {id: 54,
-                name: 'Marina Garcia', image: ''}]
+            participants: [  {id: 53,
+                name: 'Leonor Ayala', image: ''},
+                {id: 54,
+                name: 'Marina Garcia', image: ''},
+                {id: 56,
+                name: 'Pedro Lopez', image: ''},
+                {id: 57,
+                name: 'Carlos Garcia', image: ''}
+    
+            ]
         },       
     concept: 'Reserva de la casa rural',
     amount: 78,
@@ -70,8 +78,14 @@ export const EXPENSES: IExpense [] = [{
             createdBy: 1,
             image: "https://placehold.co/200x200",
             createdOn: new Date(),
-            participants: [ {id: 54,
-                name: 'Marina Garcia', image: ''}]
+            participants: [  {id: 53,
+                name: 'Leonor Ayala', image: ''},
+                {id: 54,
+                name: 'Marina Garcia', image: ''},
+                {id: 56,
+                name: 'Pedro Lopez', image: ''},
+                {id: 57,
+                name: 'Carlos Garcia', image: ''}]
         },       
     concept: 'Regalo',
     amount: 30,
@@ -126,8 +140,72 @@ export const EXPENSES: IExpense [] = [{
             createdBy: 1,
             image: "https://placehold.co/200x200",
             createdOn: new Date(),
-            participants: [ {id: 54,
-                name: 'Marina Garcia', image: ''}]
+            participants: [  {id: 53,
+                name: 'Leonor Ayala', image: ''},
+                {id: 54,
+                name: 'Marina Garcia', image: ''},
+                {id: 56,
+                name: 'Pedro Lopez', image: ''},
+                {id: 57,
+                name: 'Carlos Garcia', image: ''}]
+        },       
+    concept: 'Decoracion',
+    amount: 30,
+    paidBy: 2,
+    createdBy: 1,
+    expenseDate: new Date(),
+    maxDate: new Date(),
+    image: "https://placehold.co/200x200",
+    createdOn:new Date(),
+    expenseStatus:'Paid',
+    participants: [
+    { 
+        
+        idParticipant: 53,
+        participantName: 'Leonor Ayala',
+        participantImage:'',
+        percentage: 0.40,
+        amount:15,
+        expenseStatus:'Paid'
+    },
+    { 
+        idParticipant: 54,
+        participantName: 'Marina Garcia',
+        participantImage:'',
+        percentage: 0.20,
+        amount:7.5,
+        expenseStatus:'Paid'
+    },
+    { 
+        idParticipant: 56,
+        participantName: 'Pedro Lopez',
+        participantImage:'',
+        percentage: 0.2,
+        amount:7.5,
+        expenseStatus:'Paid'
+    },
+    { 
+        idParticipant: 57,
+        participantName: 'Carlos Garcia',
+        participantImage:'',
+        percentage: 0.2,
+        amount:7.5,
+        expenseStatus:'Paid'
+    }]
+},
+{
+    id: 4,
+    group: 
+        { 
+            
+            id: 2,
+            name: 'Compañeros de EGB',
+            description: 'Qué bien lo pasamos',
+            createdBy: 1,
+            image: '',
+            createdOn: new Date(),
+            participants: []
+
         },       
     concept: 'Decoracion',
     amount: 30,
