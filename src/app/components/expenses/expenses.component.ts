@@ -29,8 +29,8 @@ export class ExpensesComponent {
   arrGroups: IGroup[]=[];
   expensesInfo: IExpense[]=[];
 
-  expensesServices= inject (ExpensesService);
-  groupsServices=inject (GroupsService);
+  expensesService= inject (ExpensesService);
+  groupsService=inject (GroupsService);
 
   searchForm:FormGroup|any;
 
@@ -55,19 +55,23 @@ ngOnInit(){
     let aSelectedGroup=paramValue?parseInt(paramValue):NaN;
     if(!isNaN(aSelectedGroup)){
       console.log('selectedGroup '+ paramValue);
-      let aGroup=this.groupsServices.getById(aSelectedGroup);
+      let aGroup=this.groupsService.getById(aSelectedGroup);
       this.searchForm = new FormGroup({
         selectedGroup: new FormControl(aGroup, [Validators.required])
       });
       
       this.searchData();
     }else{
-      this.expensesInfo=this.expensesServices.getAllExpensesWithinUserGroups(this.user);
+      this.expensesInfo=this.expensesService.getAllExpensesWithinUserGroups(this.user);
     }
 
   });
   
-  this.arrGroups=this.groupsServices.getAllGroupsByUser(this.user);
+  this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
+    console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
+    this.arrGroups=  data;
+  });
+
   
   
 }
@@ -76,7 +80,7 @@ searchData(){
   console.log('ExpensesComponent searchData ' + JSON.stringify(this.searchForm.value));
   const {id}=this.searchForm.value.selectedGroup;
   console.log('ExpensesComponent searchData ' +id);
-  this.expensesInfo=this.expensesServices.getAllExpensesWithinUserGroupsFilteredByGroup(this.user,id);
+  this.expensesInfo=this.expensesService.getAllExpensesWithinUserGroupsFilteredByGroup(this.user,id);
 }
 
 }

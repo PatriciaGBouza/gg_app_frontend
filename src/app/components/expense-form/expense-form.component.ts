@@ -19,9 +19,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { Message, MessageService } from 'primeng/api';
 
 import { IUser } from '../../interfaces/iuser.interface';
-import { IExistingGroup } from '../../interfaces/igroup.interface';
 import { IExpense } from '../../interfaces/iexpense.interface';
 import { IParticipant } from '../../interfaces/iparticipant.interface';
+import { IGroup } from '../../interfaces/igroup.interface';
 
 
 
@@ -51,7 +51,7 @@ export class ExpenseFormComponent {
   isEmptyForm: boolean|any;
 
   /* DATA for the groups dropdown and the paid by dropdown and the uploaded files*/
-  arrGroupsCreatedByUser: IExistingGroup[]=[]; 
+  arrGroupsCreatedByUser: IGroup[]=[]; 
   arrParticipantsWithinAGroup: IParticipant[]=[];
   uploadedFiles: any[] = [];
 
@@ -105,8 +105,12 @@ export class ExpenseFormComponent {
     });
 
     //INICIALIZAMOS DATOS
-    this.arrGroupsCreatedByUser=this.groupsService.getAllGroupsByUser(this.user);
-   
+    this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
+      console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
+      this.arrGroupsCreatedByUser=  data;
+    });
+  
+      
     
     //LEEMOS DE PARAMS , PARA VER SI ESTAMOS EN MODO EDICION
     this.activatedRoute.params.subscribe((params: any) => {
@@ -244,7 +248,7 @@ export class ExpenseFormComponent {
   }
 
 
-  updateParticipantsOnFormForANewExpense(aGroup:IExistingGroup){
+  updateParticipantsOnFormForANewExpense(aGroup:IGroup){
     const arrParticipationOnANewExpense =this.groupsService.getAllParticipantsWithinAGroup(this.user,aGroup);
     if(arrParticipationOnANewExpense=== undefined) {
         this.participants.clear();

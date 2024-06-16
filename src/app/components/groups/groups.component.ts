@@ -25,18 +25,15 @@ export class GroupsComponent {
   groupsInfo: IGroup[]|any;
 
   /*logged user, TO_DO, to be changed */
-  user: IUser={ id: 1};
+  user: IUser={ id: 8};
 
   ngOnInit(){
-    this.groupsInfo=this.groupsService.getAllGroupsByUser(this.user);
-    //console.log(this.groupsInfo);
-  }
-
- /* ngOnInit() {
-    this.groupsService.getAllGroups().subscribe() => {
-        console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
-        this.groupsInfo=data;
-        
-    });
-  }*/
+    this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
+      console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
+      this.groupsInfo=  data;
+    
+    console.log(this.groupsInfo);
+  });
 }
+
+ }

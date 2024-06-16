@@ -23,8 +23,9 @@ export class GroupsService {
   constructor() { }
 
   /* Devuelve los grupos creados por un usuario*/
-  getAllGroupsByUser(aUser:IUser): IExistingGroup[] {
-    return this.arrGroups.filter(group => group.createdBy === aUser.id);
+  getAllGroupsByUser(aUser:IUser):  Observable<IGroup[]> {
+    return this.httpClient.get<IGroup[]>(`${this.url}/creator/${aUser.id}`);
+    //return this.arrGroups.filter(group => group.createdBy === aUser.id);
   }
 
   /* Devuelve un grupo concreto*/
@@ -34,7 +35,7 @@ export class GroupsService {
 
   
   /* Devuelve participantes dentro de un grupo */
-  getAllParticipantsWithinAGroup(aUser:IUser, aGroup:IExistingGroup): IParticipant[]|undefined{
+  getAllParticipantsWithinAGroup(aUser:IUser, aGroup:IGroup): IParticipant[]|undefined{
     return this.arrGroups.find(({id}) => id === aGroup.id)?.participants;
   }
 
