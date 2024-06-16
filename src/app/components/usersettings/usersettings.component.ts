@@ -4,10 +4,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { ImageCropperComponent, ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-usersettings',
@@ -18,6 +20,7 @@ import { AuthService } from '../../services/auth.service';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
+    MatSnackBarModule,
     ImageCropperComponent
   ],
   templateUrl: './usersettings.component.html',
@@ -37,8 +40,10 @@ export class UserSettingsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private authService: AuthService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private authService: AuthService
   ) {
     this.settingsForm = this.fb.group({
       name: ['', Validators.required],
@@ -48,12 +53,12 @@ export class UserSettingsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.loadUser();
+  async ngOnInit(): Promise<void> {
+    await this.loadUser();
   }
 
-  loadUser(): void {
-    this.user = this.authService.getUser();
+  async loadUser(): Promise<void> {
+    this.user = this.userService.getUserFromLocalStorage();
     if (this.user && this.user.id) {
       this.settingsForm.patchValue(this.user);
       console.log('Loaded user data:', this.user); // Log user data
@@ -66,24 +71,44 @@ export class UserSettingsComponent implements OnInit {
     this.editField = field;
   }
 
-  saveField(field: string): void {
+  async saveField(field: string): Promise<void> {
     if (this.settingsForm.get(field)?.valid) {
       const updateData = { [field]: this.settingsForm.get(field)?.value };
-      this.userService.updateUser({ ...this.user, ...updateData }).subscribe(response => {
+      try {
+        const response = await this.userService.updateUser({ ...this.user, ...updateData }).toPromise();
         console.log(`${field} updated:`, response);
         this.user[field] = this.settingsForm.get(field)?.value;
         this.editField = '';
-      });
+        this.snackBar.open(`${this.getFieldLabel(field)} actualizado exitosamente`, 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-success']
+        });
+      } catch (error) {
+        this.snackBar.open(`Error al actualizar ${this.getFieldLabel(field)}. Inténtalo de nuevo.`, 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-error']
+        });
+      }
     }
   }
 
-  deleteUser(): void {
-    const userId = this.authService.getUser().id;
-    this.userService.deleteUser(userId).subscribe(response => {
-      console.log('User deleted:', response);
-      this.authService.logout();
-      // Redirect to the login page or another appropriate page
-    });
+  async deleteUser(): Promise<void> {
+    const userId = this.user.id;
+    try {
+      const response = await this.userService.deleteUser(userId).toPromise();
+      console.log('Usuario eliminado:', response);
+      this.snackBar.open('Usuario eliminado exitosamente', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-success']
+      });
+      this.authService.logout(); // Log out the user
+      this.router.navigate(['/principal']);
+    } catch (error) {
+      this.snackBar.open('Error al eliminar el usuario. Inténtalo de nuevo.', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+      });
+    }
   }
 
   fileChangeEvent(event: any): void {
@@ -106,7 +131,7 @@ export class UserSettingsComponent implements OnInit {
   }
 
   loadImageFailed(): void {
-    this.imageError = 'The image URL is not valid';
+    this.imageError = 'La URL de la imagen no es válida';
     this.imageUrlValid = false;
   }
 
@@ -121,7 +146,7 @@ export class UserSettingsComponent implements OnInit {
         this.convertImageToBase64(img);
       };
       img.onerror = () => {
-        this.imageError = 'The image URL is not valid';
+        this.imageError = 'La URL de la imagen no es válida';
         this.imageUrlValid = false;
       };
       img.src = imageUrl;
@@ -137,5 +162,15 @@ export class UserSettingsComponent implements OnInit {
       ctx.drawImage(img, 0, 0);
       this.imageBase64 = canvas.toDataURL('image/png');
     }
+  }
+
+  getFieldLabel(field: string): string {
+    const fieldLabels: { [key: string]: string } = {
+      name: 'Nombre',
+      email: 'Correo electrónico',
+      password: 'Contraseña',
+      image_url: 'URL de la imagen'
+    };
+    return fieldLabels[field] || field;
   }
 }
