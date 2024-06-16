@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { IParticipant } from '../interfaces/iparticipant.interface';
 import { PARTICIPANTS_INAGROUP, PARTICIPANTS_CONTACTSOFAUSER } from '../db/participants.db';
 import { IUser } from '../interfaces/iuser.interface';
-import { IExistingGroup, IGroup } from '../interfaces/igroup.interface';
+import { IGroup } from '../interfaces/igroup.interface';
 
 @Injectable({
   providedIn: 'root'

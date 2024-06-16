@@ -22,6 +22,7 @@ import { IUser } from '../../interfaces/iuser.interface';
 import { IExpense } from '../../interfaces/iexpense.interface';
 import { IParticipant } from '../../interfaces/iparticipant.interface';
 import { IGroup } from '../../interfaces/igroup.interface';
+import { UserService } from '../../services/user.service';
 
 
 
@@ -40,11 +41,14 @@ export class ExpenseFormComponent {
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
 
-  private parent: string = '';
+  parent: string|any = ''; 
+
+  user:any;
 
   /* SERVICES */
   expensesService = inject(ExpensesService);
   groupsService=inject (GroupsService);
+  userService=inject(UserService);
  
   /* REACTIVE FORM */ 
   modelForm: FormGroup|any;
@@ -57,9 +61,6 @@ export class ExpenseFormComponent {
 
 
   messages: Message[] = [];
-
-  /*logged user, TO_DO, to be changed */
-  private user: IUser={ id: 1};
   
 
   constructor(private messageService: MessageService) {
@@ -94,17 +95,17 @@ export class ExpenseFormComponent {
 
   ngOnInit(){
 
+      
     this.activatedRoute.queryParamMap.subscribe((paramMap) => {
       // read param from paramMap
-      // TO-DO: TRY TO CHANGE THIS AND REPLACE WITH STATES, also in expense form
-      const paramValue = paramMap.get('parent');
-      console.log('parent '+ paramValue);
-      // use parameter...
-    
+      // TO-DO: TRY TO CHANGE THIS AND REPLACE WITH STATES, also in group form
+      this.parent = paramMap.get('parent');
+      this.parent ??='home';
 
     });
 
     //INICIALIZAMOS DATOS
+    this.user = this.userService.getUserFromLocalStorage();
     this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
       console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
       this.arrGroupsCreatedByUser=  data;
@@ -294,7 +295,12 @@ export class ExpenseFormComponent {
             );
           
             this.modelForm.reset();
-            this.router.navigate(['/expenses']);
+            if(this.parent ==='list')
+              this.router.navigate(['/expenses']);
+            else 
+              this.router.navigate(['/home']);
+
+            
           } else {
             this.messages.push(
               { severity: 'error', summary: 'Error durante la actualización', detail: 'Por favor, contacte con el administrador' }

@@ -20,6 +20,7 @@ import { TableModule } from 'primeng/table';
 
 import { IUser } from '../../interfaces/iuser.interface';
 import { IParticipant } from '../../interfaces/iparticipant.interface';
+import { UserService } from '../../services/user.service';
 
 
 
@@ -39,9 +40,11 @@ export class GroupFormComponent {
   activatedRoute = inject(ActivatedRoute);
 
   parent: string|any = '';                 
-
+  
+  user:any;
   
   /* SERVICES */
+  userService=inject(UserService);
   groupsService = inject(GroupsService);
   participantsService = inject(GroupParticipantsService);
 
@@ -56,9 +59,6 @@ export class GroupFormComponent {
   uploadedFiles: any[] = [];
 
   messages: Message[] = [];
-
-  /*logged user, TO_DO, to be changed */
-  user: IUser={ id: 1};
 
   invitationsCount=0;
 
@@ -89,7 +89,6 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       []
     );
       this.isEmptyForm = true;
- 
       this.messageService=messageService;
       
   }
@@ -106,6 +105,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
     });
 
      //INICIALIZAMOS DATOS
+    this.user = this.userService.getUserFromLocalStorage();
     this.arrParticipants=this.participantsService.getAllAvailableParticipants(this.user);
     this.buildTreeNodeData(this.arrParticipants);
     this.selectedParticipants=[];
@@ -272,7 +272,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
             if(this.parent ==='list')
               this.router.navigate(['/groups']);
             else 
-            this.router.navigate(['/home']);
+              this.router.navigate(['/home']);
           } else {
             this.messages.push(
               { severity: 'error', summary: 'Error durante la actualización', detail: 'Por favor, contacte con el administrador' }

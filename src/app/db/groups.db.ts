@@ -1,7 +1,6 @@
-import { IExistingGroup } from "../interfaces/igroup.interface";
+import { IGroup } from "../interfaces/igroup.interface";
 
-
-export const GROUPS: IExistingGroup [] = [
+export const GROUPS: IGroup [] = [
     { 
         id: 1,
         name: 'Familia',

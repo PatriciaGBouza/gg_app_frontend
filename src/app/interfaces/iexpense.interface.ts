@@ -1,9 +1,9 @@
-import { IExistingGroup } from "./igroup.interface";
-import { IParticipant } from "./iparticipant.interface";
+import { IGroup } from "./igroup.interface";
+
 
 export interface IExpense {
     id?: number;
-    group:IExistingGroup;
+    group:IGroup;
     concept: string;
     amount: number;
     paidBy?: number;
