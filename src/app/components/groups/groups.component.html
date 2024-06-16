@@ -42,11 +42,11 @@
                         </button>
                         <button mat-menu-item disabled>
                         <mat-icon>other</mat-icon>
-                        <span>Second option</span>
+                        <span>Archivar grupo</span>
                         </button>
-                        <button mat-menu-item>
+                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/expenses']" [queryParams]="{selectedGroup: element.id}">
                         <mat-icon>last option</mat-icon>
-                        <span>Third option</span>
+                        <span>Ir a gastos </span>
                         </button>
                     </mat-menu>
                 </td>

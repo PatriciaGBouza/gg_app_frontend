@@ -32,3 +32,31 @@
     width:  95%;
    
 }
+
+.details-form__form-field{
+    flex-basis: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+
+.details-form__form-field__label{
+    font-size: 1.1rem;
+    
+ }
+
+ .details-form__row{
+    padding: 10px;
+}
+
+.details-form__form-field__input{
+    font-size: 1rem;
+    width: 400px;
+}
+
+
+ .test{
+    border-color: red;
+    border-width: 5px;
+    border-style: dashed;
+}

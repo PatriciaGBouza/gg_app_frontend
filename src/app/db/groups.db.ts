@@ -1,7 +1,7 @@
-import { IGroup } from "../interfaces/igroup.interface";
+import { IExistingGroup } from "../interfaces/igroup.interface";
 
 
-export const GROUPS: IGroup [] = [
+export const GROUPS: IExistingGroup [] = [
     { 
         id: 1,
         name: 'Familia',
@@ -9,8 +9,16 @@ export const GROUPS: IGroup [] = [
         createdBy: 1,
         image: "https://placehold.co/200x200",
         createdOn: new Date(),
-        participants: [ {id: 54,
-            name: 'Marina Garcia', image: ''}]
+        participants: [ 
+            {id: 53,
+            name: 'Leonor Ayala', image: ''},
+            {id: 54,
+            name: 'Marina Garcia', image: ''},
+            {id: 56,
+            name: 'Pedro Lopez', image: ''},
+            {id: 57,
+            name: 'Carlos Garcia', image: ''}
+        ]
     },
     { 
         id: 2,

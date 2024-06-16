@@ -21,6 +21,29 @@
                                 <div class="container">
                                         <div class="details-form__row">
                                             <div  class='details-form__form-field ' >
+                                                    
+                                                
+                                                @if (isEmptyForm) {
+                                                <label for="group"  class="details-form__form-field__label">Grupo</label>
+                                                <p-dropdown 
+                                                    [options]="arrGroupsCreatedByUser" 
+                                                    formControlName="group" 
+                                                    optionLabel="name"
+                                                    (onClick)="onChangeGroup()"
+                                                    />
+
+                                                    @if (validateField('group', 'required')){
+                                                        <small id="group-help"  class="details-form__form-field__smalllabel error">
+                                                            * Obligatorio
+                                                        </small>
+                                            
+                                                    }
+                                                }
+                                                </div>
+                                        </div>
+
+                                        <div class="details-form__row">
+                                            <div  class='details-form__form-field ' >
                                                       
                                                 <label for="concept"  class="details-form__form-field__label">Concepto</label>
                                                 <input 
@@ -32,8 +55,18 @@
                                                         <small id="concept-help"  class="details-form__form-field__smalllabel error">
                                                             * Obligatorio
                                                         </small>
-                                               
                                                     }
+                                                    @if (validateField('concept', 'minlength')) {
+                                                        <small id="concept-help"  class="details-form__form-field__smalllabel error">
+                                                            * Longitud mínima: 3 carácteres
+                                                        </small>
+                                                    }
+                                                    @if (validateField('concept', 'maxlength')) {
+                                                        <small id="concept-help"  class="details-form__form-field__smalllabel error">
+                                                            * Longitud máxima: 255 carácteres
+                                                        </small>
+                                                    }
+
                                         </div>
                                     </div>
                                 
@@ -41,7 +74,7 @@
                                         <div  class='details-form__form-field ' >
                                                 <label for="amount" class="details-form__form-field__label" >Cantidad</label>
                                                 <input 
-                                                    pInputText class="details-form__form-field__input"  
+                                                    pInputText class="details-form__form-field__smallinput"  
                                                     id="amount" 
                                                     formControlName="amount"/>
                                                    
@@ -51,16 +84,33 @@
                                                             * Obligatorio
                                                         </small>
                                                     }
+                                                    @if (validateField('amount', 'min')) {
+                                                        <small id="amount-help"  class="details-form__form-field__smalllabel error">
+                                                            * Cantidad mínima: 1 
+                                                        </small>
+                                                    }
+                                                    @if (validateField('amount', 'max')) {
+                                                        <small id="amount-help"  class="details-form__form-field__smalllabel error">
+                                                            * Cantidad máxima: 100.000
+                                                        </small>
+                                                    }
+                                                    @if (validateField('amount', 'pattern')) {
+                                                        <small id="amount-help"  class="details-form__form-field__smalllabel error">
+                                                            * Campo numérico
+                                                        </small>
+                                                    }
                                         </div>
                                     </div>
 
                                     <div class="details-form__row">
                                         <div  class='details-form__form-field' >
                                                 <label for="paidBy" class="details-form__form-field__label" >Pagado por</label>
-                                                <input 
-                                                    pInputText class="details-form__form-field__input"  
-                                                    id="paidBy" 
-                                                    formControlName="paidBy"/>
+                                                <p-dropdown 
+                                                    [options]="arrParticipantsWithinAGroup" 
+                                                    formControlName="paidBy" 
+                                                    optionLabel="name"
+                                                     
+                                                    />
                                                    
                                                     @if (validateField('paidBy', 'required')){
                                                         <small id="paidBy-help"  class="details-form__form-field__smalllabel error">

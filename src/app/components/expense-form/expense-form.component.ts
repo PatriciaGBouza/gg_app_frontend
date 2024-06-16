@@ -1,87 +1,93 @@
 import { Component, inject } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import Validation from '../../utils/Validation';
+
+import { ExpensesService } from '../../services/expenses.service';
+import { GroupsService } from '../../services/groups.service';
+
+import { MatButtonModule } from '@angular/material/button';
+
 import { FileUploadEvent, FileUploadModule } from 'primeng/fileupload';
 import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
 import { StepperModule } from 'primeng/stepper';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
-import { ExpensesService } from '../../services/expenses.service';
+import { DropdownModule } from 'primeng/dropdown';
 import { Message, MessageService } from 'primeng/api';
+
 import { IUser } from '../../interfaces/iuser.interface';
-import { IExpense, IExpenseParticipant } from '../../interfaces/iexpense.interface';
-import { GroupParticipantsService } from '../../services/group-participants.service';
-import { IGroup } from '../../interfaces/igroup.interface';
-import Validation from '../../utils/Validation';
+import { IExistingGroup } from '../../interfaces/igroup.interface';
+import { IExpense } from '../../interfaces/iexpense.interface';
+import { IParticipant } from '../../interfaces/iparticipant.interface';
+
 
 
 @Component({
   selector: 'app-expense-form',
   standalone: true,
-  imports: [ReactiveFormsModule, InputTextModule, CalendarModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,ToastModule],
+  imports: [ReactiveFormsModule, InputTextModule, CalendarModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,ToastModule,DropdownModule],
   providers: [MessageService],
   templateUrl: './expense-form.component.html',
   styleUrl: './expense-form.component.css'
 })
+
+
+
 export class ExpenseFormComponent {
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
 
-  parent: string = '';
+  private parent: string = '';
 
+  /* SERVICES */
   expensesService = inject(ExpensesService);
-  groupParticipantsService=inject(GroupParticipantsService);
-
-  arrParticipants:IExpenseParticipant[]=[];
-  arrParticipantsExpenses:IExpense[]=[];
-
-
+  groupsService=inject (GroupsService);
+ 
+  /* REACTIVE FORM */ 
   modelForm: FormGroup|any;
   isEmptyForm: boolean|any;
+
+  /* DATA for the groups dropdown and the paid by dropdown and the uploaded files*/
+  arrGroupsCreatedByUser: IExistingGroup[]=[]; 
+  arrParticipantsWithinAGroup: IParticipant[]=[];
+  uploadedFiles: any[] = [];
 
 
   messages: Message[] = [];
 
-  user: IUser={ id: 1};
+  /*logged user, TO_DO, to be changed */
+  private user: IUser={ id: 1};
   
 
-  selectedId: string|any;
+  constructor(private messageService: MessageService) {
 
-  uploadedFiles: any[] = [];
+      /* EMPTY MODEL FORM CREATION*/
+      this.modelForm = new FormGroup({
+          group: new FormControl(null, [Validators.required]),
+          concept: new FormControl(null, [Validators.required, Validators.minLength(3), Validators.maxLength(255)]),
+          amount: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(100000)]),
+          paidBy: new FormControl(null, []),
+          expenseDate: new FormControl(null, []), 
+          maxDate: new FormControl(null, []), 
+          expenseStatus: new FormControl(null, []) ,
+          participants:  new FormArray([new FormGroup({
+            participantName: new FormControl(null, [Validators.required]),
+            percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
+            amount: new FormControl(null, [Validators.required]),
+            expenseStatus: new FormControl(null, []) })
+          ]) 
+      },
+      {
+        validators: [Validation.completenessOnPercetages('participants', 'percentage')]
+      }
+        //validators: [Validation.noNaNValidator('amount', 'noNan')]
+    );
 
-  constructor(private messageService: MessageService,private fb: FormBuilder) {
-    this.modelForm = new FormGroup({
-        concept: new FormControl(null, [Validators.required]),
-        amount: new FormControl(null, [Validators.required]),
-        paidBy: new FormControl(null, []),
-        expenseDate: new FormControl(null, []), 
-        maxDate: new FormControl(null, []), 
-        expenseStatus: new FormControl(null, []) ,
-        participants:  new FormArray([new FormGroup({
-          participantName: new FormControl(null, [Validators.required]),
-          percentage: new FormControl(null, [Validators.required,  Validators.max(1)]),
-          amount: new FormControl(null, [Validators.required]),
-          expenseStatus: new FormControl(null, [])
-
-        })
-        ]) 
-      
-
-    },
-    {
-      validators: [Validation.completenessOnPercetages('participants', 'percentage')]
-    }
-  );
     this.isEmptyForm = true;
     this.messageService=messageService;
-  
-      
-  }
-
-  get participants() {
-    return this.modelForm.get('participants') as FormArray;
   }
 
  
@@ -98,101 +104,88 @@ export class ExpenseFormComponent {
 
     });
 
+    //INICIALIZAMOS DATOS
+    this.arrGroupsCreatedByUser=this.groupsService.getAllGroupsByUser(this.user);
+   
     
-
-    
-    
-
+    //LEEMOS DE PARAMS , PARA VER SI ESTAMOS EN MODO EDICION
     this.activatedRoute.params.subscribe((params: any) => {
-      let selectedId = params.id;
+
+      const selectedId = params.id;
       console.log(" ngOnInit with id "+ selectedId);
       if (selectedId !== undefined) {
+
         //case: edit expense
-      if(isNaN(selectedId)){
+        if(isNaN(selectedId)){
           this.messages.push(
             { severity: 'error', summary: 'Error', detail: 'Por favor, contacte con el administrador' }
           );
-       } else{
-        let aExpense =this.expensesService.getById(Number.parseInt(selectedId));
+        } 
+        else{
 
-        console.log(" ngOnInit edit "+ aExpense?.concept);
-        if (aExpense && aExpense.id){
-          this.isEmptyForm = false;
-          this.modelForm = new FormGroup({
-              id: new FormControl(aExpense.id, []),
-              concept: new FormControl(aExpense.concept, [Validators.required]),
-              amount: new FormControl(aExpense.amount, [Validators.required]),
-              paidBy: new FormControl(aExpense.paidBy, []),
-              expenseDate: new FormControl(aExpense.expenseDate, []), 
-              maxDate: new FormControl(aExpense.maxDate, []), 
-              expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
-              participants: new FormArray([new FormGroup({
-                participantName: new FormControl(null, [Validators.required]),
-                percentage: new FormControl(null, [Validators.required,  Validators.max(1)]),
-                amount: new FormControl(null, [Validators.required]),
-                expenseStatus: new FormControl(null, [])
-              })
-              ]) 
-          },{
-            validators: [Validation.completenessOnPercetages('participants', 'percentage')]
-          });
-          
-          
-          for (let i=0;i<aExpense.participants.length;i++){
-            console.log(" ngOnInit edit expense with participant in index "+i +" participant " +aExpense.participants[i].participantName);
-            let participantItem = new FormGroup({
-              participantName: new FormControl(aExpense.participants[i].participantName, [Validators.required]),
-              percentage: new FormControl(aExpense.participants[i].percentage, [Validators.required,  Validators.max(100)]),
-              amount: new FormControl(aExpense.participants[i].amount, [Validators.required]),
-              expenseStatus: new FormControl(aExpense.participants[i].expenseStatus, []),
+          //GET DATOS DE GASTO
+          const aExpense =this.expensesService.getById(Number.parseInt(selectedId));
+          console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
+
+          if (aExpense && aExpense.id){
+            this.isEmptyForm = false;
+            this.modelForm = new FormGroup({
+                id: new FormControl(aExpense.id, []),
+                group: new FormControl(aExpense.group,[]),
+                concept: new FormControl(aExpense.concept, [Validators.required,Validators.minLength(3), Validators.maxLength(255)]),
+                amount: new FormControl(aExpense.amount, [Validators.required, Validators.min(1), Validators.max(100000)]),
+                paidBy: new FormControl(aExpense.paidBy, []),
+                expenseDate: new FormControl(aExpense.expenseDate, []), 
+                maxDate: new FormControl(aExpense.maxDate, []), 
+                expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
+                participants: new FormArray([new FormGroup({
+                  participantName: new FormControl(null, [Validators.required]),
+                  percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
+                  amount: new FormControl(null, [Validators.required]),
+                  expenseStatus: new FormControl(null, [])
+                })
+                ]) 
+            },{
+              validators: [Validation.completenessOnPercetages('participants', 'percentage')]
             });
 
-            if(this.participants.at(i)!=undefined)
-              this.participants.setControl(i,participantItem);
-            else          
-            // Add the new form group to the FormArray
-            this.participants.insert(i,participantItem);
-          }
-          
-          console.log(" ngOnInit edit expense with num participants" + this.participants.length);
-        }else{
-          this.messages.push(
-            { severity: 'error', summary: 'Error cargando datos de gasto', detail: 'Por favor, contacte con el administrador' }
-          );
-        }
+            //INICIALIZAMOS OPTIONS DE PAID bY DROPDOWN
+            const arr= this.groupsService.getAllParticipantsWithinAGroup(this.user, aExpense.group);
+            if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
 
-       /* 
-        /* cuando API ready
-      TODO
-        });*/
+
+            //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
+            this.updateParticipantsOnForm(aExpense);
+
+            console.log(" ngOnInit edit expense with num participants" + this.participants.length);
+            console.log(" ngOnInit edit modelForm "+ this.modelForm);
+          
+          }else{
+            this.messages.push(
+              { severity: 'error', summary: 'Error cargando datos de gasto', detail: 'Por favor, contacte con el administrador' }
+            );
+          }
+
+            /* 
+              /* cuando API ready
+            TODO
+              });*/
        }
       }else{
+
+        /* EN EL CASO DE NUEVO GASTO, EL FORM YA ESTÁ CREADO EN EL CONSTRUCTOR */
         console.log(" ngOnInit add new ");
-        /* TO_DO: falta manejar grupo*/
-        this.arrParticipants =this.groupParticipantsService.getAllParticipantsWithinAGroup(this.user);
-        for (let i=0;i<this.arrParticipants.length;i++){
-          console.log(" ngOnInit edit expense with participant in index "+i +" participant " +this.arrParticipants[i].participantName);
-          let participantItem = new FormGroup({
-            participantName: new FormControl(this.arrParticipants[i].participantName, [Validators.required]),
-            percentage: new FormControl(this.arrParticipants[i].percentage, [Validators.required]),
-            amount: new FormControl(this.arrParticipants[i].amount, [Validators.required,  Validators.max(100)]),
-            expenseStatus: new FormControl(this.arrParticipants[i].expenseStatus, []),
-          });
+        console.log(" ngOnInit init modelForm "+ this.modelForm);
 
-          if(this.participants.at(i)!=undefined)
-            this.participants.setControl(i,participantItem);
-          else          
-          // Add the new form group to the FormArray
-          this.participants.insert(i,participantItem);
-        }
       }
-
-
 
     });
   }
  
      
+ get participants() {
+    return this.modelForm.get('participants') as FormArray;
+  }
 
  
 
@@ -217,7 +210,67 @@ export class ExpenseFormComponent {
     );
   }
 
-  
+
+  onChangeGroup(){
+    console.log('onChangeGroup selected '+ this.modelForm.value?.group?.id);
+    //update paidByOptions 
+    const theSelectedGroup=this.modelForm.value?.group;
+    const arr=this.groupsService.getAllParticipantsWithinAGroup(this.user, theSelectedGroup);
+    if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
+
+    //update participantsOptions 
+    this.updateParticipantsOnFormForANewExpense( this.modelForm.value.group);
+  }
+
+
+  updateParticipantsOnForm(aExpense: IExpense){
+    const arrParticipation =aExpense.participants;
+ 
+    for (let i=0;i<arrParticipation.length;i++){
+      console.log(" updateParticipantsOnForm with participant in index "+i +" participant " +arrParticipation[i].participantName);
+      let participantItem = new FormGroup({
+        participantName: new FormControl(arrParticipation[i].participantName, [Validators.required]),
+        percentage: new FormControl(arrParticipation[i].percentage, [Validators.required]),
+        amount: new FormControl(arrParticipation[i].amount, [Validators.required,  Validators.max(100)]),
+        expenseStatus: new FormControl(arrParticipation[i].expenseStatus, []),
+      });
+
+      if(this.participants.at(i)!=undefined)
+        this.participants.setControl(i,participantItem);
+      else          
+      // Add the new form group to the FormArray
+      this.participants.insert(i,participantItem);
+    }
+  }
+
+
+  updateParticipantsOnFormForANewExpense(aGroup:IExistingGroup){
+    const arrParticipationOnANewExpense =this.groupsService.getAllParticipantsWithinAGroup(this.user,aGroup);
+    if(arrParticipationOnANewExpense=== undefined) {
+        this.participants.clear();
+        console.log("  participants form cleared");
+    }else{
+      this.participants.clear();
+      for (let i=0;i<arrParticipationOnANewExpense.length;i++){
+        console.log(" updateParticipantsOnFormForANewExpense with participant in index "+i +" participant " +arrParticipationOnANewExpense[i].name);
+        let participantItem = new FormGroup({
+          participantName: new FormControl(arrParticipationOnANewExpense[i].name, [Validators.required]),
+          percentage: new FormControl(0, [Validators.required]),
+          amount: new FormControl(0, [Validators.required,  Validators.max(100)]),
+          expenseStatus: new FormControl('Reported', []),
+        });
+
+        if(this.participants.at(i)!=undefined)
+          this.participants.setControl(i,participantItem);
+        else          
+        // Add the new form group to the FormArray
+        this.participants.insert(i,participantItem);
+      }
+    }
+  }
+
+
+
 
   saveFormData(): void {
    

@@ -18,10 +18,13 @@ import { IUser } from '../../interfaces/iuser.interface';
 })
 
 export class GroupsComponent {
+
   groupsService= inject(GroupsService);
+
   displayedColumns: string[] = ['name', 'description', 'options'];
   groupsInfo: IGroup[]|any;
 
+  /*logged user, TO_DO, to be changed */
   user: IUser={ id: 1};
 
   ngOnInit(){
