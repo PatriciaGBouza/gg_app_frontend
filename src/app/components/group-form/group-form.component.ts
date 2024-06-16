@@ -48,7 +48,7 @@ export class GroupFormComponent {
   groupsService = inject(GroupsService);
   participantsService = inject(GroupParticipantsService);
 
-/* REACTIVE FORM */ 
+  /* REACTIVE FORM */ 
   modelForm: FormGroup|any;
   isEmptyForm: boolean|any;
 
@@ -155,7 +155,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
             this.messages.push(
               { severity: 'error', summary: 'Error cargando datos de grupo', detail: 'Por favor, contacte con el administrador' }
             );
-          }
+          } 
 
             /* 
               /* cuando API ready
