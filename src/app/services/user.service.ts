@@ -15,6 +15,7 @@ export class UserService {
   getUserFromLocalStorage(): any {
     const userData = localStorage.getItem('currentUser');
     return userData ? JSON.parse(userData) : null;
+    
   }
 
   getUserName(): string | null {
