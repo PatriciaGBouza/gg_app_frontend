@@ -1,9 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
 import { IGroup } from '../../interfaces/igroup.interface';
 import { IExpense } from '../../interfaces/iexpense.interface';
 import { ExpensesService } from '../../services/expenses.service';
 import { GroupsService } from '../../services/groups.service';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -15,6 +17,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { UserService } from '../../services/user.service';
+import { IApiResponse } from '../../interfaces/iapi-response';
 
 @Component({
   selector: 'app-expenses',
@@ -68,18 +71,20 @@ export class ExpensesComponent {
 
       });
       
-      this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
-        console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
-        this.arrGroups=  data;
+      this.groupsService.getAllGroupsByUser(this.user).subscribe((response: IApiResponse<IGroup[]>) => {
+        console.log("groupsService.getAllGroupsByUser returned "+ JSON.stringify(response));
+        this.arrGroups=  response.data;
       });
   
 }
 
 searchData(){
     console.log('ExpensesComponent searchData ' + JSON.stringify(this.searchForm.value));
-    const {id}=this.searchForm.value.selectedGroup;
-    console.log('ExpensesComponent searchData ' +id);
-    this.expensesInfo=this.expensesService.getAllExpensesWithinUserGroupsFilteredByGroup(this.user,id);
+    if(this.searchForm.value.selectedGroup!=null) {
+      const {id}=this.searchForm.value.selectedGroup;
+      console.log('ExpensesComponent searchData ' +id);
+      this.expensesInfo=this.expensesService.getAllExpensesWithinUserGroupsFilteredByGroup(this.user,id);
+    }
 }
 
 }

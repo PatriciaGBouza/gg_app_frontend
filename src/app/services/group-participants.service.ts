@@ -4,6 +4,9 @@ import { IParticipant } from '../interfaces/iparticipant.interface';
 import { PARTICIPANTS_INAGROUP, PARTICIPANTS_CONTACTSOFAUSER } from '../db/participants.db';
 import { IUser } from '../interfaces/iuser.interface';
 import { IGroup } from '../interfaces/igroup.interface';
+import { IApiResponse } from '../interfaces/iapi-response';
+import { environment } from '../../environments/environment.development';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,31 +14,20 @@ import { IGroup } from '../interfaces/igroup.interface';
 export class GroupParticipantsService {
 
   private httpClient=inject(HttpClient);
-  private url="https://localhost/api/groups";
+  private url = `${environment.apiURL}/users`;
 
-// hasta API ready
-  private arrParticipants: IParticipant[] = PARTICIPANTS_CONTACTSOFAUSER;
-  private lastId:number=5;
-
- 
-    
 
   constructor() { }
 
-  /* Devuelve todos los participantes que comparten grupo con el usuario que se le pasa por parámetro*/
-  getAllAvailableParticipants(aUser:IUser): IParticipant[] {
-    return PARTICIPANTS_CONTACTSOFAUSER;
+  /* Devuelve todos los participantes */
+  getAllAvailableParticipants(aUser:IUser):  Observable<IApiResponse<IParticipant[]>> {
+    return this.httpClient.get<IApiResponse<IParticipant[]>>(`${this.url}`);
   }
  
   getAllAvailableParticipantsTreeNode(aUser:IUser) {
     return Promise.resolve(this.getAllAvailableParticipants(aUser));
   }
 
-  
-  getAllParticipantsWithinAGroup(aUser:IUser, aGroup:IGroup): IParticipant[]{
-    return PARTICIPANTS_INAGROUP;
-
-  }
 
 
 }

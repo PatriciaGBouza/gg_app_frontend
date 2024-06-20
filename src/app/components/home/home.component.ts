@@ -13,6 +13,7 @@ import { IGroup } from '../../interfaces/igroup.interface';
 import { IUser } from '../../interfaces/iuser.interface';
 
 import { BalanceComponent } from '../balance/balance.component';
+import { IApiResponse } from '../../interfaces/iapi-response';
 
 
 
@@ -39,9 +40,9 @@ export class HomeComponent {
   
   ngOnInit() {
 
-    this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
-        console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
-        this.groupsInfo=  data;
+    this.groupsService.getAllGroupsByCreatorUser(this.user).subscribe((response: IApiResponse<IGroup[]>) => {
+        console.log("groupsService.getAllGroupsByUser returned "+ JSON.stringify(response));
+        this.groupsInfo=  response.data;
         this.expenses=[];
 
         this.responsiveOptions = [

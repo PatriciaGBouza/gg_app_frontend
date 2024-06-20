@@ -10,25 +10,28 @@ import { MatButtonModule} from '@angular/material/button';
 import { StepperModule } from 'primeng/stepper';
 import { Message, TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { FileUploadEvent, FileUploadModule } from 'primeng/fileupload';
 import { TableModule } from 'primeng/table';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 
-
-import { IUser } from '../../interfaces/iuser.interface';
 import { IParticipant } from '../../interfaces/iparticipant.interface';
 import { UserService } from '../../services/user.service';
+import { IApiResponse } from '../../interfaces/iapi-response';
+import { IResponseId } from '../../interfaces/iapi-responseId';
+import { IGroup } from '../../interfaces/igroup.interface';
+
+import { catchError } from 'rxjs';
+import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
 
 
 
 @Component({
   selector: 'app-group-form',
   standalone: true,
-  imports: [ReactiveFormsModule, InputTextModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,TreeModule ,ToastModule],
-  providers: [MessageService],
+  imports: [ReactiveFormsModule, InputTextModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,TreeModule, MatSnackBarModule ],
+  providers: [],
   templateUrl: './group-form.component.html',
   styleUrl: './group-form.component.css'  
 })
@@ -52,13 +55,14 @@ export class GroupFormComponent {
   modelForm: FormGroup|any;
   isEmptyForm: boolean|any;
 
+  //snackBar: MatSnackBar;
+
   /* DATA for the participants tree and upload files*/
-  arrParticipants: IParticipant[]=[];
+  arrParticipants: IParticipant[]=[]; // the array of all the available participants
   participants: TreeNode[]=[];
-  selectedParticipants: TreeNode[]=[];
+  selectedParticipants: TreeNode[]=[]; // the selected participants
   uploadedFiles: any[] = [];
 
-  messages: Message[] = [];
 
   invitationsCount=0;
 
@@ -79,161 +83,153 @@ Non-Matches
 www.myserver.mydomain.com/myfolder/mypage.aspx*/
 
 
-  constructor(private messageService: MessageService) {
+  constructor() {
     this.modelForm = new FormGroup(
       {
         name: new FormControl(null, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
         description: new FormControl(null, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
-        inviteEmail: new FormControl(null, [Validators.pattern(this.emailPattern)])
+        inviteEmail: new FormControl(null, [Validators.pattern(this.emailPattern)]),
+        image_url: new FormControl(null, [Validators.maxLength(255)]),
       },
       []
     );
-      this.isEmptyForm = true;
-      this.messageService=messageService;
+    this.isEmptyForm = true;
+    //this.snackBar=snackBar;
+      
+      
       
   }
   
-
+ 
   ngOnInit(){
 
     this.activatedRoute.queryParamMap.subscribe((paramMap) => {
-      // read param from paramMap
-      // TO-DO: TRY TO CHANGE THIS AND REPLACE WITH STATES, also in expense form
       this.parent = paramMap.get('parent');
       this.parent ??='home';
-
     });
 
      //INICIALIZAMOS DATOS
     this.user = this.userService.getUserFromLocalStorage();
-    this.arrParticipants=this.participantsService.getAllAvailableParticipants(this.user);
-    this.buildTreeNodeData(this.arrParticipants);
-    this.selectedParticipants=[];
-    this.invitationsCount=0;
+    this.participantsService.getAllAvailableParticipants(this.user).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IParticipant[]>) => {
+      console.log('participantsService.getAllAvailableParticipants returned ' + JSON.stringify(response));  
+      this.arrParticipants=response.data;
+      this.buildTreeNodeData();
+      this.selectedParticipants=[];
+      this.invitationsCount=0;
+
+    },
+        (error) => {
+          console.error('Error handler:', error);
+          /*this.snackBar.open('Error al eliminar el usuario. Inténtalo de nuevo.', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-error']
+          });
+
+          this.messages.push(
+             { severity: 'error', summary: 'Error durante la obtención de participantes disponibles', detail: 'Por favor, contacte con el administrador' }
+          )*/
+          
+    });
 
     //LEEMOS DE PARAMS , PARA VER SI ESTAMOS EN MODO EDICION
     this.activatedRoute.params.subscribe((params: any) => {
-
       const selectedId = params.id;
-      console.log(" ngOnInit with id "+ selectedId);
+      console.log("--> ngOnInit with id "+ selectedId);
       if (selectedId !== undefined) {
 
         //case: edit group
         if(isNaN(selectedId)){
-            this.messages.push(
+            /*this.messages.push(
               { severity: 'error', summary: 'Error', detail: 'Por favor, contacte con el administrador' }
-            );
+            );*/
         } else{
 
            //GET DATOS DE GRUPO
-          const aGroup =this.groupsService.getById(Number.parseInt(selectedId));
-          console.log(" ngOnInit edit "+ JSON.stringify(aGroup));
-
-          if (aGroup && aGroup.id){
-            this.isEmptyForm = false;
-
-            const theExistingGroup = {id:aGroup.id, name: aGroup.name, description: aGroup.description, image:aGroup.image, createdBy:aGroup.createdBy, createdOn:aGroup.createdOn,participants: aGroup.participants};
-            const arr= this.groupsService.getAllParticipantsWithinAGroup(this.user, theExistingGroup);
-            let keys = arr?.map(item => {
-             return item.id.toString()
-            });
+          this.groupsService.getById(Number.parseInt(selectedId)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
+              console.log('groupsService.getById returned ' + JSON.stringify(response));
+              const aGroup=response.data;
+              if (aGroup && aGroup.id){
+                this.isEmptyForm = false;
+                               
+                let keys = aGroup.participants?.map(item => {
+                return item.id.toString()
+                });
             
 
-            console.log(" ngOnInit edit selected participants are:" + keys);
+                console.log(" ngOnInit edit group where selected participants are [" + keys+"]");
 
-            if(keys!=undefined) this.preselectParticipants(keys);
-            this.modelForm = new FormGroup(
-              {
-                id: new FormControl(aGroup.id, []),
-                name: new FormControl(aGroup.name, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
-                description: new FormControl(aGroup.description, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
-                inviteEmail: new FormControl("", [ Validators.pattern(this.emailPattern)])
-              },
-              []
-            );
-          }else{
-            this.messages.push(
-              { severity: 'error', summary: 'Error cargando datos de grupo', detail: 'Por favor, contacte con el administrador' }
-            );
-          } 
-
-            /* 
-              /* cuando API ready
-            this.groupsService.getById(selectedId).subscribe((data: IGroup) => {
-                console.log(
-                  'groupsService.getById returned ' + JSON.stringify(data)
+                if(keys!=undefined) this.preselectParticipants(keys);
+                this.modelForm = new FormGroup({
+                    id: new FormControl(aGroup.id, []),
+                    name: new FormControl(aGroup.name, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
+                    description: new FormControl(aGroup.description, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
+                    inviteEmail: new FormControl("", [ Validators.pattern(this.emailPattern)]),
+                    image_url: new FormControl(aGroup.image_url, [Validators.maxLength(255)])
+                  },
+                  []
                 );
-                let aGroup = data;
-                if (aGroup.id){
-                  this.isEmptyForm = false;
-                  this.modelForm = new FormGroup(
-                    {
-                      id: new FormControl(aGroup.id, []),
-                      name: new FormControl(aGroup.name, [Validators.required]),
-                      description: new FormControl(aGroup.description, [Validators.required])
-                      
-                    },
-                    []
-                  );
-                }else{
-                  this.messages.push(
-                  { severity: 'error', summary: 'Error cargando datos de grupo', detail: 'Por favor, contacte con el administrador' }
-                );
-                }
-              });*/
+          }
+          },
+          (error) => {
+            console.error('Error handler:', error);
+            /*this.messages.push(
+               { severity: 'error', summary: 'Error durante la obtención de datos de grupo', detail: 'Por favor, contacte con el administrador' }
+            )*/
+            
+          });
+                     
        }
       }
     });
+      
   }
  
-  buildTreeNodeData(arrParticipants: IParticipant[]){
-    console.log('buildTreeNodeData  of '+arrParticipants.length +" participants" );
-    for (let i=0;i<arrParticipants.length;i++){
-      console.log('adding node with participant id  '+arrParticipants[i].id.toString());
+  buildTreeNodeData(){
+    console.log('buildTreeNodeData  of '+this.arrParticipants.length +" participants" );
+    for (let i=0;i<this.arrParticipants.length;i++){
+      //console.log('adding node with participant id  '+this.arrParticipants[i].id.toString());
       let newNode = {
-        key: arrParticipants[i].id.toString(),
-        label:  arrParticipants[i].name,
-        data:  arrParticipants[i].name,
+        key: this.arrParticipants[i].id.toString(),
+        label:  this.arrParticipants[i].name,
+        data:  this.arrParticipants[i].name,
         icon: '',
         children: [ ]
       };
       this.participants.push(newNode);
     }
   }
-  
- preselectParticipants(keys: string[]){
-  console.log('Preselect participants ' +keys);
-  this.preselectNodes(keys,this.participants);
+ 
+  preselectParticipants(keys: string[]){
+    console.log('Check as participant already assigned to group: ' +keys);
+    this.preselectNodes(keys,this.participants);
  }
 
 
- sendInvitation(){
-  console.log('Send Invitation '+ this.modelForm.value.inviteEmail);
-  
-  let newNode = {
-    key: 'TOBEADDED'+this.invitationsCount,
-    label:  this.modelForm.value.inviteEmail + ' (Invitar)',
-    data:  this.modelForm.value.inviteEmail,
-    icon: '',
-    children: [
-    ]
-  };
-  this.selectedParticipants.push(newNode);
-  this.participants.unshift(newNode);
-  this.messageService.add(
-    { severity: 'info', summary: 'Email añadido correctamente', detail: 'Email ' +  this.modelForm.value.inviteEmail +  ' añadido correctamente' , key: 'br', life: 3000 }
-  );
-  this.modelForm.get('inviteEmail').reset();
-  this.invitationsCount++;
+ /* HTML FORM METHODS */
+ /* Add invitation from the html form */
+  addInvitation(){
+    console.log('Send Invitation '+ this.modelForm.value.inviteEmail);
+    
+    let newNode = {
+      key: 'TOBEADDED'+this.invitationsCount,
+      label:  this.modelForm.value.inviteEmail + ' (Invitar)',
+      data:  this.modelForm.value.inviteEmail,
+      icon: '',
+      children: [
+      ]
+    };
+    this.selectedParticipants.push(newNode);
+    this.participants.unshift(newNode);
+    /*this.messageService.add(
+      { severity: 'info', summary: 'Email añadido correctamente', detail: 'Email ' +  this.modelForm.value.inviteEmail +  ' añadido correctamente' , key: 'br', life: 3000 }
+    );*/
+    this.modelForm.get('inviteEmail').reset();
+    this.invitationsCount++;
  
  }
    
-
-  validateField(
-    formControlName: string,
-    validator: string
-  ): boolean | undefined {
-      
+ /* Validate field from the html form */
+  validateField(formControlName: string, validator: string ): boolean | undefined {
     return (
       this.modelForm.get(formControlName)?.hasError(validator) &&
       this.modelForm.get(formControlName)?.touched
@@ -241,94 +237,22 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
   }
 
 
-
   emailEmpty(){
     let value=this.modelForm.get('inviteEmail').value;
     return (value == null || ((typeof value === 'string' || Array.isArray(value)) && value.length === 0));
     
   }
-
   
-  saveFormData(): void {
-  
-   if (this.modelForm.value.id) {
-      console.log(' saveFormData update');
-      //update
-      let aGroup = this.groupsService.update(this.modelForm.value, this.buildArrayParticipantsFromSelected(), this.user);
 
-        /* this.groupsService
-        .update(this.modelForm.value)
-        .subscribe((data: IGroup) => {
-          console.log('groupsService.update returned ' + JSON.stringify(data));
-          let aGroup = data;
-          */
-          if (aGroup.id) {
-            this.messageService.add(
-              { severity: 'success', summary: 'Grupo actualizado correctamente', detail: 'Grupo ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' actualizado correctamente' , key: 'br', life: 3000  }
-            );
-          
-            this.modelForm.reset();
-            console.log(' saveFormData update ' + this.parent); 
-            if(this.parent ==='list')
-              this.router.navigate(['/groups']);
-            else 
-              this.router.navigate(['/home']);
-          } else {
-            this.messages.push(
-              { severity: 'error', summary: 'Error durante la actualización', detail: 'Por favor, contacte con el administrador' }
-            )
-          }
-        /* });*/
-    } else {
-      console.log('saveFormData insert');
-      //insert
-        let aGroup = this.groupsService.insert(this.modelForm.value, this.buildArrayParticipantsFromSelected(), this.user);
+/* TREE NODE METHODS */
 
-        /*.subscribe((data: IGroup) => {
-          console.log('groupsService.insert returned ' + JSON.stringify(data));
-          let aGroup = data;*/
+isTreeNode = (item: TreeNode | undefined): item is TreeNode => { return !!item }
 
-          if (aGroup.id) {
-            this.messageService.add(
-              { severity: 'success', summary: 'Grupo creado correctamente', detail: 'Nuevo grupo ' +  aGroup.id +  ' ' + aGroup.name +  ' ' +  aGroup.description + ' creado correctamente' , key: 'br', life: 3000 }
-            );
-            
-            this.modelForm.reset();
-            this.router.navigate(['/groups']);
-          } else {
-            this.messages.push(
-              { severity: 'error', summary: 'Error durante la creación', detail: 'Por favor, contacte con el administrador' }
-            )
-          }
-       /* });*/
-   /* }*/
-  }
-  }
-
-
-  buildArrayParticipantsFromSelected():IParticipant[]{
-    const arrPart:IParticipant[]=[];
-    for (let selPart of this.selectedParticipants) {
-      let aSelectedKey=selPart.key;
-      if (aSelectedKey!=undefined){
-        let iSeletedKey=Number.parseInt(aSelectedKey);
-        let thePart=this.arrParticipants.find(({id}) => id === iSeletedKey );
-        console.log(' Saving as participant: '+thePart?.id +' ' +thePart?.name );
-        if(thePart!=undefined)
-          arrPart.push(thePart);
-      }
-   }
-    return arrPart;
-  }
-
-  isTreeNode = (item: TreeNode | undefined): item is TreeNode => { return !!item }
-
-  preselectNodes(keys: string[], allNodes: TreeNode[]): void {
+preselectNodes(keys: string[], allNodes: TreeNode[]): void {
     this.selectedParticipants = keys.map(key => this.getNodeWithKey(key, allNodes)).filter(this.isTreeNode);
-  }
+}
 
-  
-  getNodeWithKey(key: string, nodes: TreeNode[]): TreeNode | undefined {
+getNodeWithKey(key: string, nodes: TreeNode[]): TreeNode | undefined {
     for (let node of nodes) {
  
       if (node.key === key) {
@@ -343,21 +267,112 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       }
     }
     return undefined;
- }
+}
 
+/* FILE UPLOAD METHODS */
 
  onUpload(event:FileUploadEvent) {
   for(let file of event.files) {
       this.uploadedFiles.push(file);
   }
 
-  this.messageService.add({severity: 'info', summary: 'Fichero subido', detail: ''});
+  /*this.messageService.add({severity: 'info', summary: 'Fichero subido', detail: ''});*/
 }
 
-
-
+/* MESSAGE SERVICE METHODS*/
  showBottomRight() {
-  this.messageService.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', key: 'br', life: 3000 });
+  /*this.messageService.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', key: 'br', life: 3000 });*/
 }
+
+/* SAVE FORM DATA */
+saveFormData(): void {
+  
+  if (this.modelForm.value.id) {
+     console.log('--> saveFormData update');
+       //update
+       
+       this.groupsService.update(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
+           console.log('groupsService.update returned ' + JSON.stringify(response));
+           
+           this.saveFormDataSendInvitations (this.modelForm.value.id) ;
+           this.modelForm.reset();
+           console.log(' saveFormData update ' + this.parent); 
+           if(this.parent ==='list')
+             this.router.navigate(['/groups']);
+           else 
+             this.router.navigate(['/home']);
+         
+       },
+       (error) => {
+         console.error('Error handler:', error);
+         /*this.messages.push(
+           { severity: 'error', summary: 'Error durante la actualización de grupo', detail: 'Por favor, contacte con el administrador' }
+         )*/
+       });
+   } else {
+     console.log('saveFormData insert');
+     
+       //insert group
+       let theNewId:any;
+       this.groupsService.insert(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
+         console.log('groupsService.insert returned ' + JSON.stringify(response));
+         
+         theNewId=response.data.id;
+         this.saveFormDataSendInvitations (theNewId) ;
+                     
+       },
+        (error) => {
+          // This block will only execute if catchError is used
+          console.error('Error handler:', error);
+          /*this.messages.push(
+           { severity: 'error', summary: 'Error durante la creación', detail: 'Por favor, contacte con el administrador' }
+         )*/
+        });
+
+
+   }
+
+ }
+ 
+ saveFormDataSendInvitations(idGroup:number){
+   //insert invitations
+   this.groupsService.insertParticipants(idGroup,this.getArrraySelectedParticipants()).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
+     console.log('groupsService.insertParticipants returned ' + JSON.stringify(response));
+   
+     /*this.messageService.add(
+         { severity: 'success', summary: 'Grupo e invitaciones creadas correctamente', detail: 'Grupo e invitaciones creadas correctamente' , key: 'br', life: 3000 }
+     );*/
+     
+     this.modelForm.reset();
+     this.router.navigate(['/groups']);
+             
+     },
+     (error) => {
+       // This block will only execute if catchError is used
+       console.error('Error handler:', error);
+       /*this.messages.push(
+         { severity: 'error', summary: 'Error durante la creación de invitaciones ', detail: 'Por favor, contacte con el administrador' }
+       )*/
+     }
+   );
+}
+ 
+
+getArrraySelectedParticipants():IParticipant[]{
+   const arrPart:IParticipant[]=[];
+   for (let selPart of this.selectedParticipants) {
+     
+     let aSelectedKey=selPart.key;
+     if (aSelectedKey!=undefined){
+       let iSeletedKey=Number.parseInt(aSelectedKey);
+       console.log(' buildArrayParticipantsFromSelected key:'+iSeletedKey);
+       let thePart=this.arrParticipants.find(({id}) => id === iSeletedKey );
+       console.log(' Saving as participant: '+thePart?.id +' ' +thePart?.name );
+       if(thePart!=undefined)
+         arrPart.push(thePart);
+     }
+  }
+   return arrPart;
+ }
  
 }

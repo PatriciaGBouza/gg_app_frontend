@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IGroup } from '../interfaces/igroup.interface';
+import { IGroup, IGroupBasicData, IGroupInvitations } from '../interfaces/igroup.interface';
 import { GROUPS } from '../db/groups.db';
 import { IUser } from '../interfaces/iuser.interface';
 import { IParticipant } from '../interfaces/iparticipant.interface';
 import { environment } from '../../environments/environment.development';
+import { IApiResponse } from '../interfaces/iapi-response';
+import { IResponseId } from '../interfaces/iapi-responseId';
 
 @Injectable({
   providedIn: 'root'
@@ -18,80 +20,57 @@ export class GroupsService {
 
 // hasta API ready
   private arrGroups: IGroup[] = GROUPS
-  private lastId:number=5;
+
 
   constructor() { }
 
   /* Devuelve los grupos creados por un usuario*/
-  getAllGroupsByUser(aUser:IUser):  Observable<IGroup[]> {
-    return this.httpClient.get<IGroup[]>(`${this.url}/creator/${aUser.id}`);
-    //return this.httpClient.get<IApiResponse<IGroup[]>>(`${this.url}/creator/${creatorId}`);
+  getAllGroupsByCreatorUser(aUser:IUser):  Observable<IApiResponse<IGroup[]>> {
+    return this.httpClient.get<IApiResponse<IGroup[]>>(`${this.url}/creator/${aUser.id}`);
+  }
 
-    //return this.arrGroups.filter(group => group.createdBy === aUser.id);
+  
+  /* Devuelve los grupos a los que pertenece un usuario*/
+  getAllGroupsByUser(aUser:IUser):  Observable<IApiResponse<IGroup[]>> {
+    return this.httpClient.get<IApiResponse<IGroup[]>>(`${this.url}/user/${aUser.id}/groups`);
   }
 
   /* Devuelve un grupo concreto*/
-  getById(id_param: number):IGroup|undefined {
-    return this.arrGroups.find(({id}) => id === id_param);
+  getById(id_param: number):  Observable<IApiResponse<IGroup>> {
+    return this.httpClient.get<IApiResponse<IGroup>>(`${this.url}/${id_param}`);
   }
-
   
   /* Devuelve participantes dentro de un grupo */
   getAllParticipantsWithinAGroup(aUser:IUser, aGroup:IGroup): IParticipant[]|undefined{
     return this.arrGroups.find(({id}) => id === aGroup.id)?.participants;
   }
 
-  insert(aGroup:IGroup, arrParticipants: IParticipant[], aUser:IUser): IGroup{
-    this.lastId++;
-    const theNewGroup = {id:this.lastId, name: aGroup.name, description: aGroup.description, image:aGroup.image, createdBy:aUser.id, createdOn:new Date(),participants: arrParticipants};
-    this.arrGroups.push(theNewGroup);
-    return theNewGroup;
+  /* Crea un nuevo grupo */
+  insert(aGroup:IGroup): Observable<IApiResponse<IResponseId>>{
+    const theNewGroup:IGroupBasicData = {name: aGroup.name, description: aGroup.description, image_url:aGroup.image_url};
+    console.log('groupsService.insert with BODY '+ JSON.stringify(theNewGroup));
+    return this.httpClient.post<IApiResponse<IResponseId>>(`${this.url}`,theNewGroup);
   }
 
-  update(aGroup:IGroup, arrParticipants: IParticipant[],  aUser:IUser): IGroup{
-    return aGroup;
+  /* Invita a participantes en un grupo */
+  insertParticipants(idGroup:number, arrParticipants: IParticipant[]): Observable<IApiResponse<IResponseId>>{
+    const theInvitations:IGroupInvitations = {participants:arrParticipants};
+    console.log('groupsService.insertParticipants with BODY '+ JSON.stringify(theInvitations) +' and idGroup: '+idGroup);
+    return this.httpClient.post<IApiResponse<IResponseId>>(`${this.url}/${idGroup}/invite/`,theInvitations);
   }
 
-  delete (id: number){
+  /* Actualiza un grupo */
+  update(aGroup:IGroup): Observable<IApiResponse<null>>{
+    const theGroup:IGroupBasicData = {id: aGroup.id,name: aGroup.name, description: aGroup.description, image_url:aGroup.image_url};
+    console.log('groupsService.update with BODY '+ JSON.stringify(theGroup));
+    return this.httpClient.put<IApiResponse<null>>(`${this.url}/${aGroup.id}`,theGroup);
+  }
 
+  /*Borra un grupo */
+  delete (idGroup: number): Observable<IApiResponse<any>>{
+    return this.httpClient.delete<IApiResponse<IResponseId>>(`${this.url}/${idGroup}`);
   }
 
 
-
-
-
-  /* cuando API ready
-getAllGroups(): Observable<IApiResponse<IGroup[]>> {
-    return this.httpClient.get<IApiResponse<IGroup[]>>(this.url);
-  }
-
-  getGroupById(id: number): Observable<IApiResponse<IGroup>> {
-    return this.httpClient.get<IApiResponse<IGroup>>(`${this.url}/${id}`);
-  }
-
-  getGroupsByCreatorId(creatorId: number): Observable<IApiResponse<IGroup[]>> {
-    return this.httpClient.get<IApiResponse<IGroup[]>>(`${this.url}/creator/${creatorId}`);
-  }
-
-  addGroup(group: IGroup): Observable<IApiResponse<IGroup>> {
-    return this.httpClient.post<IApiResponse<IGroup>>(this.url, group);
-  }
-
-  updateGroup(group: IGroup): Observable<IApiResponse<IGroup>> {
-    return this.httpClient.put<IApiResponse<IGroup>>(`${this.url}/${group.id}`, group);
-  }
-
-  deleteGroup(id: number): Observable<IApiResponse<IGroup>> {
-    return this.httpClient.delete<IApiResponse<IGroup>>(`${this.url}/${id}`);
-  }
-
-  getGroupStateByGroupId(groupId: number): Observable<IApiResponse<any>> {
-    return this.httpClient.get<IApiResponse<any>>(`${this.url}/${groupId}/state`);
-  }
-
-  activateGroup(groupId: number): Observable<IApiResponse<any>> {
-    return this.httpClient.post<IApiResponse<any>>(`${this.url}/${groupId}/activate`, {});
-  }
-   
-    */
+  
 }

@@ -2,15 +2,15 @@ import { IParticipant } from "../interfaces/iparticipant.interface";
 
 export const PARTICIPANTS_CONTACTSOFAUSER: IParticipant [] = [
     {id: 53,
-       name: 'Leonor Ayala', image: ''},
+       name: 'Leonor Ayala', email:'', image: ''},
        {id: 54,
-       name: 'Marina Garcia', image: ''},
+       name: 'Marina Garcia', email:'', image: ''},
        {id: 56,
-       name: 'Pedro Lopez', image: ''},
+       name: 'Pedro Lopez',  email:'',image: ''},
        {id: 57,
-       name: 'Carlos Garcia', image: ''},
+       name: 'Carlos Garcia',  email:'',image: ''},
        {id: 58,
-        name: 'Emilio Fernandez', image: ''} ]
+        name: 'Emilio Fernandez',  email:'',image: ''} ]
 
 
  export const PARTICIPANTS_TREEDATA: any [] = [
@@ -66,12 +66,12 @@ export const PARTICIPANTS_CONTACTSOFAUSER: IParticipant [] = [
 
  export const PARTICIPANTS_INAGROUP: IParticipant [] = [
  {id: 53,
-    name: 'Leonor Ayala', image: ''},
+    name: 'Leonor Ayala',  email:'',image: ''},
     {id: 54,
-    name: 'Marina Garcia', image: ''},
+    name: 'Marina Garcia',  email:'',image: ''},
     {id: 56,
-    name: 'Pedro Lopez', image: ''},
+    name: 'Pedro Lopez',  email:'',image: ''},
     {id: 57,
-    name: 'Carlos Garcia', image: ''}
+    name: 'Carlos Garcia',  email:'',image: ''}
     ]
  

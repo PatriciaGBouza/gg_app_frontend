@@ -38,8 +38,12 @@
                     <mat-menu #menu="matMenu">
                         <button mat-menu-item routerLinkActive="active" [routerLink]="['/editgroup',element.id ]" [queryParams]="{parent: 'list'}">
                         <mat-icon>edit</mat-icon>
-                        <span>Edit</span>
+                        <span>Editar</span>
                         </button>
+                        <button mat-menu-item (click)="deleteGroup(element.id)">
+                            <mat-icon>borrar</mat-icon>
+                            <span>Borrar</span>
+                            </button>
                         <button mat-menu-item disabled>
                         <mat-icon>other</mat-icon>
                         <span>Archivar grupo</span>
