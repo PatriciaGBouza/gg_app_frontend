@@ -8,13 +8,11 @@ export class LoadingService {
 
   showLoadingSpinner(){
     this.loading = true;
-    console.log('loading here');
     //code to show loading spinner
   }
 
   hideLoadingSpinner(){
     this.loading = false;
-    console.log('hidden loading spinner');
     // code to hide loading spinner
   }
 

@@ -23,6 +23,7 @@ import { IExpense } from '../../interfaces/iexpense.interface';
 import { IParticipant } from '../../interfaces/iparticipant.interface';
 import { IGroup } from '../../interfaces/igroup.interface';
 import { UserService } from '../../services/user.service';
+import { IApiResponse } from '../../interfaces/iapi-response';
 
 
 
@@ -105,11 +106,11 @@ export class ExpenseFormComponent {
 
     //INICIALIZAMOS DATOS
     this.user = this.userService.getUserFromLocalStorage();
-    this.groupsService.getAllGroupsByUser(this.user).subscribe((data: IGroup[]) => {
-      console.log("groupsService.getAllGroups returned "+ JSON.stringify(data));
-      this.arrGroupsCreatedByUser=  data;
+    
+    this.groupsService.getAllGroupsByUser(this.user).subscribe((response: IApiResponse<IGroup[]>) => {
+      console.log("groupsService.getAllGroupsByUser returned "+ JSON.stringify(response));
+      this.arrGroupsCreatedByUser=  response.data;
     });
-  
       
     
     //LEEMOS DE PARAMS , PARA VER SI ESTAMOS EN MODO EDICION

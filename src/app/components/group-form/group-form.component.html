@@ -8,8 +8,7 @@
                 <div class='details-form__top' >Actualiza los datos de tu grupo</div>
             }
 
-            <p-toast position="bottom-left" key="br" />
-                                        
+                                               
             <div >
             <p-stepper class="stepper">
                 
@@ -114,14 +113,14 @@
                                     <input type="text" pInputText id="inviteEmail" formControlName="inviteEmail"  />
 
                                     @if ( emailEmpty()){
-                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="true" />
+                                        <p-button  [text]="true"  (click)="addInvitation()"  label="Invitar" [disabled]="true" />
                                     }@else if (validateField('inviteEmail', 'pattern')){
                                         <small id="description-help"  class="details-form__form-field__smalllabel error">
                                             * Formato inválido
                                         </small>
-                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="true" />
+                                        <p-button  [text]="true"  (click)="addInvitation()"  label="Invitar" [disabled]="true" />
                                     }@else {
-                                        <p-button  [text]="true"  (click)="sendInvitation()"  label="Invitar" [disabled]="false" />
+                                        <p-button  [text]="true"  (click)="addInvitation()"  label="Invitar" [disabled]="false" />
                                     }
                                
                                 
@@ -145,6 +144,28 @@
                     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
                         <div class="flex flex-column h-12rem">
                             <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                                <div class="container">
+                                    <div class="details-form__row">
+                                        <div  class='details-form__form-field ' >
+                                                  
+                                            <label for="name"  class="details-form__form-field__label">Image url</label>
+                                            <input 
+                                                pInputText  class="details-form__form-field__input" 
+                                                id="image_url" 
+                                                formControlName="image_url"/>
+                                                                  
+                                                
+                                                @if (validateField('image_url', 'maxlength')) {
+                                                    <small id="name-help"  class="details-form__form-field__smalllabel error">
+                                                        * Longitud máxima: 255 carácteres
+                                                    </small>
+                                                }                     
+                                            
+                                        </div>
+                                     </div>
+                                
+                                
+                                
                                 <p-fileUpload 
                                     name="demo[]" 
                                     url="https://www.primefaces.org/cdn/api/upload.php" 
@@ -161,6 +182,7 @@
                                             
                                         </ng-template>
                                 </p-fileUpload>
+                            </div>
                             </div>
                         </div>
                         <div class="flex pt-4 justify-content-start ">

@@ -6,17 +6,17 @@ export const GROUPS: IGroup [] = [
         name: 'Familia',
         description: 'Celebramos la abuela cumple 90!',
         createdBy: 1,
-        image: "https://placehold.co/200x200",
+        image_url: "https://placehold.co/200x200",
         createdOn: new Date(),
         participants: [ 
             {id: 53,
-            name: 'Leonor Ayala', image: ''},
+            name: 'Leonor Ayala',  email:'',image: ''},
             {id: 54,
-            name: 'Marina Garcia', image: ''},
+            name: 'Marina Garcia', email:'', image: ''},
             {id: 56,
-            name: 'Pedro Lopez', image: ''},
+            name: 'Pedro Lopez',  email:'',image: ''},
             {id: 57,
-            name: 'Carlos Garcia', image: ''}
+            name: 'Carlos Garcia', email:'', image: ''}
         ]
     },
     { 
@@ -24,7 +24,7 @@ export const GROUPS: IGroup [] = [
         name: 'Compañeros de EGB',
         description: 'Qué bien lo pasamos',
         createdBy: 1,
-        image: '',
+        image_url: '',
         createdOn: new Date(),
         participants: []
     },
@@ -33,7 +33,7 @@ export const GROUPS: IGroup [] = [
         name: 'Padel 2024',
         description: 'Padel domingueros 2024',
         createdBy: 1,
-        image: '',
+        image_url: '',
         createdOn: new Date(),
         participants: []
     },
@@ -42,7 +42,7 @@ export const GROUPS: IGroup [] = [
         name: 'Nuevo grupo',
         description: 'Descr grupo',
         createdBy: 1,
-        image: '',
+        image_url: '',
         createdOn: new Date(),
         participants: []
     },
@@ -52,7 +52,7 @@ export const GROUPS: IGroup [] = [
         name: 'Otro',
         description: 'Otro desc',
         createdBy: 2,
-        image: '',
+        image_url: '',
         createdOn: new Date(),
         participants: []
     }
