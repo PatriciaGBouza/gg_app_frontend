@@ -115,14 +115,16 @@
                                     @if ( emailEmpty()){
                                         <p-button  [text]="true"  (click)="addInvitation()"  label="Invitar" [disabled]="true" />
                                     }@else if (validateField('inviteEmail', 'pattern')){
-                                        <small id="description-help"  class="details-form__form-field__smalllabel error">
+                                        <small id="inviteEmail-help"  class="details-form__form-field__smalllabel error">
                                             * Formato inválido
                                         </small>
                                         <p-button  [text]="true"  (click)="addInvitation()"  label="Invitar" [disabled]="true" />
                                     }@else {
                                         <p-button  [text]="true"  (click)="addInvitation()"  label="Invitar" [disabled]="false" />
                                     }
-                               
+                                    <small id="inviteEmail-help"  class="details-form__form-field__smalllabel">
+                                        * Las personas invitadas a través de su email serán visibles como participantes cuando se registren en GG APP
+                                    </small>
                                 
 
 
@@ -151,11 +153,11 @@
                                             <label for="name"  class="details-form__form-field__label">Image url</label>
                                             <input 
                                                 pInputText  class="details-form__form-field__input" 
-                                                id="image_url" 
-                                                formControlName="image_url"/>
+                                                id="image" 
+                                                formControlName="image"/>
                                                                   
                                                 
-                                                @if (validateField('image_url', 'maxlength')) {
+                                                @if (validateField('image', 'maxlength')) {
                                                     <small id="name-help"  class="details-form__form-field__smalllabel error">
                                                         * Longitud máxima: 255 carácteres
                                                     </small>

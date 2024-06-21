@@ -28,18 +28,11 @@
             <div class="list-table">
                 <table mat-table [dataSource]="expensesInfo"  >
 
-
-                    
+                
                 <!--- Note that these columns can be defined in any order.
                     The actual rendered columns are set as a property on the row definition" -->
             
                 
-            
-                <!-- Group Column -->
-                <ng-container matColumnDef="group">
-                <th mat-header-cell *matHeaderCellDef> Grupo </th>
-                <td mat-cell *matCellDef="let element"> {{element.group.name}} </td>
-                </ng-container>
             
                 <!-- Concept Column -->
                 <ng-container matColumnDef="concept">
@@ -54,21 +47,22 @@
                 </ng-container>
                 
                 <!-- PaidBy Column -->
-                <ng-container matColumnDef="paidBy">
+                <ng-container matColumnDef="payer_user_id">
                 <th mat-header-cell *matHeaderCellDef> Pagado por </th>
-                <td mat-cell *matCellDef="let element"> {{element.paidBy.name}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.payer_user_id}} </td>
                 </ng-container>
 
-                <!-- Expense status Column -->
-                <ng-container matColumnDef="expenseStatus">
-                <th mat-header-cell *matHeaderCellDef> Estado </th>
-                <td mat-cell *matCellDef="let element"> {{element.expenseStatus}} </td>
-                </ng-container>
-                            
+                                         
                 <!-- Expense date Column -->
-                <ng-container matColumnDef="expenseDate">
+                <ng-container matColumnDef="date">
                 <th mat-header-cell *matHeaderCellDef> Fecha del gasto </th>
-                <td mat-cell *matCellDef="let element"> {{element.expenseDate| date: 'dd/MM/yyyy' }}  </td>
+                <td mat-cell *matCellDef="let element"> {{element.date| date: 'dd/MM/yyyy' }}  </td>
+                </ng-container>
+
+                 <!-- Expense max date Column -->
+                <ng-container matColumnDef="max_date">
+                <th mat-header-cell *matHeaderCellDef> Fecha máxima para saldar el gasto </th>
+                <td mat-cell *matCellDef="let element"> {{element.max_date| date: 'dd/MM/yyyy' }}  </td>
                 </ng-container>
             
                 <ng-container matColumnDef="options">
@@ -78,7 +72,7 @@
                         <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editexpense',element.id ]" [queryParams]="{parent: 'list'}">
+                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editexpense',element.expense_id ]" [queryParams]="{parent: 'list'}">
                         <mat-icon>edit</mat-icon>
                         <span>Edit</span>
                         </button>
@@ -97,6 +91,11 @@
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
                 </table>
             </div>
+            @if (expensesInfo.length==0){
+                <small id="expenses-help"  class="details-form__form-warningMessage">
+                 No hay gastos registrados para el grupo seleccionado
+                </small>
+            }
         </div>   
     </div>
 </section>

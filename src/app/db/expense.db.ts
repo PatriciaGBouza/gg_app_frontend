@@ -2,17 +2,17 @@ import { IExpense } from "../interfaces/iexpense.interface";
 
 
 
-
+/*
 
 export const EXPENSES: IExpense [] = [{
-    id: 1,
+    groups_id: 1,
     group: 
         { 
             id: 1,
             name: 'Familia',
             description: 'Celebramos la abuela cumple 90!',
             createdBy: 1,
-            image_url: "https://placehold.co/200x200",
+            image: "https://placehold.co/200x200",
             createdOn: new Date(),
             participants: [  {id: 53,
                 name: 'Leonor Ayala',  email:'',image: ''},
@@ -76,7 +76,7 @@ export const EXPENSES: IExpense [] = [{
             name: 'Familia',
             description: 'Celebramos la abuela cumple 90!',
             createdBy: 1,
-            image_url: "https://placehold.co/200x200",
+            image: "https://placehold.co/200x200",
             createdOn: new Date(),
             participants: [  {id: 53,
                 name: 'Leonor Ayala',  email:'',image: ''},
@@ -138,7 +138,7 @@ export const EXPENSES: IExpense [] = [{
             name: 'Familia',
             description: 'Celebramos la abuela cumple 90!',
             createdBy: 1,
-            image_url: "https://placehold.co/200x200",
+            image: "https://placehold.co/200x200",
             createdOn: new Date(),
             participants: [  {id: 53,
                 name: 'Leonor Ayala',  email:'',image: ''},
@@ -202,7 +202,7 @@ export const EXPENSES: IExpense [] = [{
             name: 'Compañeros de EGB',
             description: 'Qué bien lo pasamos',
             createdBy: 1,
-            image_url: '',
+            image: '',
             createdOn: new Date(),
             participants: []
 
@@ -254,3 +254,5 @@ export const EXPENSES: IExpense [] = [{
 
 
 ]
+
+*/

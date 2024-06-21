@@ -16,7 +16,7 @@ import { TableModule } from 'primeng/table';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 
-import { IParticipant } from '../../interfaces/iparticipant.interface';
+import { IParticipant, IParticipantInvitations } from '../../interfaces/iparticipant.interface';
 import { UserService } from '../../services/user.service';
 import { IApiResponse } from '../../interfaces/iapi-response';
 import { IResponseId } from '../../interfaces/iapi-responseId';
@@ -24,6 +24,7 @@ import { IGroup } from '../../interfaces/igroup.interface';
 
 import { catchError } from 'rxjs';
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
+import StateTranslation from '../../utils/StateTranslation';
 
 
 
@@ -55,12 +56,12 @@ export class GroupFormComponent {
   modelForm: FormGroup|any;
   isEmptyForm: boolean|any;
 
-  //snackBar: MatSnackBar;
+  aSnackBar: MatSnackBar;
 
   /* DATA for the participants tree and upload files*/
   arrParticipants: IParticipant[]=[]; // the array of all the available participants
   participants: TreeNode[]=[];
-  selectedParticipants: TreeNode[]=[]; // the selected participants
+  selectedParticipants: TreeNode[]=[]; // the selected participants of the tree node
   uploadedFiles: any[] = [];
 
 
@@ -83,18 +84,18 @@ Non-Matches
 www.myserver.mydomain.com/myfolder/mypage.aspx*/
 
 
-  constructor() {
+  constructor(private snackBar: MatSnackBar) {
     this.modelForm = new FormGroup(
       {
         name: new FormControl(null, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
         description: new FormControl(null, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
         inviteEmail: new FormControl(null, [Validators.pattern(this.emailPattern)]),
-        image_url: new FormControl(null, [Validators.maxLength(255)]),
+        image: new FormControl(null, [Validators.maxLength(255)]),
       },
       []
     );
     this.isEmptyForm = true;
-    //this.snackBar=snackBar;
+    this.aSnackBar=snackBar;
       
       
       
@@ -118,17 +119,13 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       this.invitationsCount=0;
 
     },
-        (error) => {
-          console.error('Error handler:', error);
-          /*this.snackBar.open('Error al eliminar el usuario. Inténtalo de nuevo.', 'Cerrar', {
-            duration: 3000,
-            panelClass: ['snackbar-error']
-          });
-
-          this.messages.push(
-             { severity: 'error', summary: 'Error durante la obtención de participantes disponibles', detail: 'Por favor, contacte con el administrador' }
-          )*/
-          
+    (error) => {
+      console.error('Error handler:', error);
+      this.aSnackBar.open('Error al cargar participantes. Por favor, contacte con el administrador.', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+      });
+              
     });
 
     //LEEMOS DE PARAMS , PARA VER SI ESTAMOS EN MODO EDICION
@@ -139,23 +136,25 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
 
         //case: edit group
         if(isNaN(selectedId)){
-            /*this.messages.push(
-              { severity: 'error', summary: 'Error', detail: 'Por favor, contacte con el administrador' }
-            );*/
+            this.snackBar.open('Error leyendo id de grupo. Por favor, contacte con el administrador', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-error']
+          });
         } else{
 
-           //GET DATOS DE GRUPO
+          //GET DATOS DE GRUPO
           this.groupsService.getById(Number.parseInt(selectedId)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
               console.log('groupsService.getById returned ' + JSON.stringify(response));
               const aGroup=response.data;
               if (aGroup && aGroup.id){
                 this.isEmptyForm = false;
-                               
+                
+                
                 let keys = aGroup.participants?.map(item => {
-                return item.id.toString()
+                  return item.id.toString()
                 });
             
-
+                //ESTE KEYS ES EL QUE USARIA PARA SABER QUÉ ID S TENIA DE INICIO
                 console.log(" ngOnInit edit group where selected participants are [" + keys+"]");
 
                 if(keys!=undefined) this.preselectParticipants(keys);
@@ -164,18 +163,18 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
                     name: new FormControl(aGroup.name, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
                     description: new FormControl(aGroup.description, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
                     inviteEmail: new FormControl("", [ Validators.pattern(this.emailPattern)]),
-                    image_url: new FormControl(aGroup.image_url, [Validators.maxLength(255)])
+                    image: new FormControl(aGroup.image, [Validators.maxLength(255)])
                   },
                   []
                 );
-          }
+            }
           },
           (error) => {
             console.error('Error handler:', error);
-            /*this.messages.push(
-               { severity: 'error', summary: 'Error durante la obtención de datos de grupo', detail: 'Por favor, contacte con el administrador' }
-            )*/
-            
+            this.aSnackBar.open('Error durante la obtención de datos de grupo. Por favor, contacte con el administrador.', 'Cerrar', {
+                duration: 3000,
+                panelClass: ['snackbar-error']
+            });
           });
                      
        }
@@ -183,14 +182,19 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
     });
       
   }
- 
+  
+  updateNodeData(key:string, state:string){
+
+  }
+
+
   buildTreeNodeData(){
     console.log('buildTreeNodeData  of '+this.arrParticipants.length +" participants" );
     for (let i=0;i<this.arrParticipants.length;i++){
       //console.log('adding node with participant id  '+this.arrParticipants[i].id.toString());
       let newNode = {
         key: this.arrParticipants[i].id.toString(),
-        label:  this.arrParticipants[i].name,
+        label:  this.arrParticipants[i].name +' ( estado: ' +StateTranslation.getState(this.arrParticipants[i].state) + ' )' ,
         data:  this.arrParticipants[i].name,
         icon: '',
         children: [ ]
@@ -211,7 +215,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
     console.log('Send Invitation '+ this.modelForm.value.inviteEmail);
     
     let newNode = {
-      key: 'TOBEADDED'+this.invitationsCount,
+      key: 'NEWINVITATION'+this.invitationsCount,
       label:  this.modelForm.value.inviteEmail + ' (Invitar)',
       data:  this.modelForm.value.inviteEmail,
       icon: '',
@@ -220,9 +224,12 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
     };
     this.selectedParticipants.push(newNode);
     this.participants.unshift(newNode);
-    /*this.messageService.add(
-      { severity: 'info', summary: 'Email añadido correctamente', detail: 'Email ' +  this.modelForm.value.inviteEmail +  ' añadido correctamente' , key: 'br', life: 3000 }
-    );*/
+
+    this.snackBar.open('Email añadido correctamente', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-success']
+    });
+    
     this.modelForm.get('inviteEmail').reset();
     this.invitationsCount++;
  
@@ -276,12 +283,10 @@ getNodeWithKey(key: string, nodes: TreeNode[]): TreeNode | undefined {
       this.uploadedFiles.push(file);
   }
 
-  /*this.messageService.add({severity: 'info', summary: 'Fichero subido', detail: ''});*/
-}
-
-/* MESSAGE SERVICE METHODS*/
- showBottomRight() {
-  /*this.messageService.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', key: 'br', life: 3000 });*/
+  this.snackBar.open('Fichero añadido correctamente', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-success']
+  });
 }
 
 /* SAVE FORM DATA */
@@ -290,45 +295,56 @@ saveFormData(): void {
   if (this.modelForm.value.id) {
      console.log('--> saveFormData update');
        //update
-       
        this.groupsService.update(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
-           console.log('groupsService.update returned ' + JSON.stringify(response));
+          console.log('groupsService.update returned ' + JSON.stringify(response));
            
-           this.saveFormDataSendInvitations (this.modelForm.value.id) ;
-           this.modelForm.reset();
-           console.log(' saveFormData update ' + this.parent); 
-           if(this.parent ==='list')
-             this.router.navigate(['/groups']);
-           else 
-             this.router.navigate(['/home']);
+          this.saveFormDataSendInvitations (this.modelForm.value.id) ;
+          this.modelForm.reset();
+
+          this.aSnackBar.open('Grupo actualizado correctamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-sucess']
+          });
+          
+          console.log(' saveFormData update ' + this.parent); 
+          
+          if(this.parent ==='list')
+            this.router.navigate(['/groups']);
+          else 
+            this.router.navigate(['/home']);
          
        },
        (error) => {
          console.error('Error handler:', error);
-         /*this.messages.push(
-           { severity: 'error', summary: 'Error durante la actualización de grupo', detail: 'Por favor, contacte con el administrador' }
-         )*/
+         this.aSnackBar.open('Error durante la actualización de grupo. Por favor, contacte con el administrador.', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-error']
+          });
+        
        });
    } else {
-     console.log('saveFormData insert');
+     console.log('--> saveFormData insert');
      
-       //insert group
-       let theNewId:any;
-       this.groupsService.insert(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
-         console.log('groupsService.insert returned ' + JSON.stringify(response));
-         
-         theNewId=response.data.id;
-         this.saveFormDataSendInvitations (theNewId) ;
-                     
-       },
-        (error) => {
-          // This block will only execute if catchError is used
-          console.error('Error handler:', error);
-          /*this.messages.push(
-           { severity: 'error', summary: 'Error durante la creación', detail: 'Por favor, contacte con el administrador' }
-         )*/
+      //insert group
+      let theNewId:any;
+      this.groupsService.insert(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
+        console.log('groupsService.insert returned ' + JSON.stringify(response));
+       
+        theNewId=response.data.id;
+        this.saveFormDataSendInvitations (theNewId) ;
+        this.aSnackBar.open('Grupo creado correctamente', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-sucess']
         });
-
+                     
+      },
+      (error) => {
+          console.error('Error handler:', error);
+          this.aSnackBar.open('Error durante la creación de nuevo grupo. Por favor, contacte con el administrador.', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-error']
+            });
+      });
 
    }
 
@@ -338,38 +354,42 @@ saveFormData(): void {
    //insert invitations
    this.groupsService.insertParticipants(idGroup,this.getArrraySelectedParticipants()).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
      console.log('groupsService.insertParticipants returned ' + JSON.stringify(response));
-   
-     /*this.messageService.add(
-         { severity: 'success', summary: 'Grupo e invitaciones creadas correctamente', detail: 'Grupo e invitaciones creadas correctamente' , key: 'br', life: 3000 }
-     );*/
-     
-     this.modelForm.reset();
-     this.router.navigate(['/groups']);
-             
+          
      },
      (error) => {
        // This block will only execute if catchError is used
        console.error('Error handler:', error);
-       /*this.messages.push(
-         { severity: 'error', summary: 'Error durante la creación de invitaciones ', detail: 'Por favor, contacte con el administrador' }
-       )*/
+       this.aSnackBar.open('Error durante la creación de invitaciones. Por favor, contacte con el administrador.', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+        });
      }
    );
 }
  
 
-getArrraySelectedParticipants():IParticipant[]{
-   const arrPart:IParticipant[]=[];
+getArrraySelectedParticipants():IParticipantInvitations[]{
+   const arrPart:IParticipantInvitations[]=[];
    for (let selPart of this.selectedParticipants) {
      
      let aSelectedKey=selPart.key;
      if (aSelectedKey!=undefined){
-       let iSeletedKey=Number.parseInt(aSelectedKey);
-       console.log(' buildArrayParticipantsFromSelected key:'+iSeletedKey);
-       let thePart=this.arrParticipants.find(({id}) => id === iSeletedKey );
-       console.log(' Saving as participant: '+thePart?.id +' ' +thePart?.name );
-       if(thePart!=undefined)
-         arrPart.push(thePart);
+       
+       if(aSelectedKey.startsWith('NEWINVITATION')){
+
+          const anInvitation={email:selPart.data};
+          console.log(' Inviting email: '+anInvitation.email );
+          arrPart.push(anInvitation);
+
+       }else {
+
+          let iSeletedKey=Number.parseInt(aSelectedKey);
+          console.log(' buildArrayParticipantsFromSelected key:'+iSeletedKey);
+          let thePart=this.arrParticipants.find(({id}) => id === iSeletedKey );
+          console.log(' Saving as participant: '+thePart?.id +' ' +thePart?.name );
+          if(thePart!=undefined)
+            arrPart.push(thePart);
+        }
      }
   }
    return arrPart;

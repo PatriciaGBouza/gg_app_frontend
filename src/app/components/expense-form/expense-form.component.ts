@@ -14,24 +14,25 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
 import { StepperModule } from 'primeng/stepper';
 import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 import { DropdownModule } from 'primeng/dropdown';
-import { Message, MessageService } from 'primeng/api';
 
-import { IUser } from '../../interfaces/iuser.interface';
 import { IExpense } from '../../interfaces/iexpense.interface';
 import { IParticipant } from '../../interfaces/iparticipant.interface';
 import { IGroup } from '../../interfaces/igroup.interface';
 import { UserService } from '../../services/user.service';
 import { IApiResponse } from '../../interfaces/iapi-response';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
+import { catchError } from 'rxjs';
+import { IResponseId } from '../../interfaces/iapi-responseId';
 
 
 
 @Component({
   selector: 'app-expense-form',
   standalone: true,
-  imports: [ReactiveFormsModule, InputTextModule, CalendarModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,ToastModule,DropdownModule],
-  providers: [MessageService],
+  imports: [ReactiveFormsModule, InputTextModule, CalendarModule, FileUploadModule, TableModule, MatButtonModule,StepperModule,DropdownModule, MatSnackBarModule],
+  providers: [],
   templateUrl: './expense-form.component.html',
   styleUrl: './expense-form.component.css'
 })
@@ -60,11 +61,10 @@ export class ExpenseFormComponent {
   arrParticipantsWithinAGroup: IParticipant[]=[];
   uploadedFiles: any[] = [];
 
+  aSnackBar: MatSnackBar;
 
-  messages: Message[] = [];
-  
 
-  constructor(private messageService: MessageService) {
+  constructor( private snackBar: MatSnackBar) {
 
       /* EMPTY MODEL FORM CREATION*/
       this.modelForm = new FormGroup({
@@ -75,21 +75,21 @@ export class ExpenseFormComponent {
           expenseDate: new FormControl(null, []), 
           maxDate: new FormControl(null, []), 
           expenseStatus: new FormControl(null, []) ,
-          participants:  new FormArray([new FormGroup({
+          /*participants:  new FormArray([new FormGroup({
             participantName: new FormControl(null, [Validators.required]),
             percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
             amount: new FormControl(null, [Validators.required]),
             expenseStatus: new FormControl(null, []) })
-          ]) 
-      },
-      {
-        validators: [Validation.completenessOnPercetages('participants', 'percentage')]
+          ]) */
       }
+      /*,{
+        validators: [Validation.completenessOnPercetages('participants', 'percentage')]
+      }*/
         //validators: [Validation.noNaNValidator('amount', 'noNan')]
     );
 
     this.isEmptyForm = true;
-    this.messageService=messageService;
+    this.aSnackBar=snackBar
   }
 
  
@@ -117,65 +117,80 @@ export class ExpenseFormComponent {
     this.activatedRoute.params.subscribe((params: any) => {
 
       const selectedId = params.id;
-      console.log(" ngOnInit with id "+ selectedId);
+      console.log("--> ngOnInit with id "+ selectedId);
       if (selectedId !== undefined) {
 
         //case: edit expense
         if(isNaN(selectedId)){
-          this.messages.push(
-            { severity: 'error', summary: 'Error', detail: 'Por favor, contacte con el administrador' }
-          );
-        } 
+          this.snackBar.open('Error leyendo id de gasto. Por favor, contacte con el administrador', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-error']
+          });
+        }
         else{
 
             //GET DATOS DE GASTO
-            const aExpense =this.expensesService.getById(Number.parseInt(selectedId));
-            console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
-
-            if (aExpense && aExpense.id){
+            this.expensesService.getById(Number.parseInt(selectedId)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IExpense>) => {
+              console.log('groupsService.getById returned ' + JSON.stringify(response));
+              const aExpense=response.data;
+              
+              console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
+              console.log(" ngOnInit setting values for edit "+aExpense && aExpense.expense_id); 
+              if (aExpense && aExpense.expense_id){
+                  console.log(" ngOnInit setting values for edit "); 
                   this.isEmptyForm = false;
                   this.modelForm = new FormGroup({
-                      id: new FormControl(aExpense.id, []),
-                      group: new FormControl(aExpense.group,[]),
+                      id: new FormControl(aExpense.expense_id, []),
+                      group: new FormControl(aExpense.groups_id,[]),
                       concept: new FormControl(aExpense.concept, [Validators.required,Validators.minLength(3), Validators.maxLength(255)]),
                       amount: new FormControl(aExpense.amount, [Validators.required, Validators.min(1), Validators.max(100000)]),
-                      paidBy: new FormControl(aExpense.paidBy, []),
-                      expenseDate: new FormControl(aExpense.expenseDate, []), 
-                      maxDate: new FormControl(aExpense.maxDate, []), 
+                      paidBy: new FormControl(aExpense.payer_user_id, []),
+                      expenseDate: new FormControl(aExpense.date, []), 
+                      maxDate: new FormControl(aExpense.max_date, []), 
                       expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
-                      participants: new FormArray([new FormGroup({
+                      /*participants: new FormArray([new FormGroup({
                         participantName: new FormControl(null, [Validators.required]),
                         percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
                         amount: new FormControl(null, [Validators.required]),
                         expenseStatus: new FormControl(null, [])
                       })
-                      ]) 
-                  },{
-                    validators: [Validation.completenessOnPercetages('participants', 'percentage')]
-                  });
+                      ])*/ 
+                  }
+                  /*,{
+                    validators: [Validation.completenessOnPercetages('participants', 'percentage')]}*/
+                  );
 
                   //INICIALIZAMOS OPTIONS DE PAID bY DROPDOWN
-                  const arr= this.groupsService.getAllParticipantsWithinAGroup(this.user, aExpense.group);
-                  if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
 
+                  this.groupsService.getById(aExpense.groups_id).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
+                    console.log('groupsService.getById returned ' + JSON.stringify(response));
+                    const arr=response.data.participants;
+                    if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
 
-                  //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
-                  this.updateParticipantsOnForm(aExpense);
+                    //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
+                    //this.updateParticipantsOnForm(aExpense);
 
-                  console.log(" ngOnInit edit expense with num participants" + this.participants.length);
-                  console.log(" ngOnInit edit modelForm "+ this.modelForm);
+                    console.log(" ngOnInit edit expense with num participants" + this.participants.length);
+                    console.log(" ngOnInit edit modelForm "+ this.modelForm);
+                  },
+                   (error) => {
+                    console.error('Error handler:', error);
+                    this.aSnackBar.open('Error durante la obtención de datos de grupo. Por favor, contacte con el administrador.', 'Cerrar', {
+                        duration: 3000,
+                        panelClass: ['snackbar-error']
+                    });
+                  });
                 
-              }else{
-                  this.messages.push(
-                    { severity: 'error', summary: 'Error cargando datos de gasto', detail: 'Por favor, contacte con el administrador' }
-                  );
               }
-
-              /* 
-                /* cuando API ready
-              TODO
-                });*/
-            }
+            },
+            (error) => {
+              console.error('Error handler:', error);
+              this.snackBar.open('Error al cargar gasto. Por favor, contacte con el administrador', 'Cerrar', {
+                duration: 3000,
+                panelClass: ['snackbar-error']
+              });
+            });
+        } 
       }else{
 
         /* EN EL CASO DE NUEVO GASTO, EL FORM YA ESTÁ CREADO EN EL CONSTRUCTOR */
@@ -183,8 +198,8 @@ export class ExpenseFormComponent {
         console.log(" ngOnInit init modelForm "+ this.modelForm);
 
       }
-
     });
+ 
   }
  
      
@@ -220,14 +235,29 @@ export class ExpenseFormComponent {
     console.log('onChangeGroup selected '+ this.modelForm.value?.group?.id);
     //update paidByOptions 
     const theSelectedGroup=this.modelForm.value?.group;
-    const arr=this.groupsService.getAllParticipantsWithinAGroup(this.user, theSelectedGroup);
-    if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
 
-    //update participantsOptions 
-    this.updateParticipantsOnFormForANewExpense( this.modelForm.value.group);
+    this.groupsService.getById(Number.parseInt(theSelectedGroup)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
+      console.log('groupsService.getById returned ' + JSON.stringify(response));
+      const arr=response.data.participants;
+      if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
+
+      //update participantsOptions 
+      //this.updateParticipantsOnFormForANewExpense( this.modelForm.value.group);
+   },
+    (error) => {
+      console.error('Error handler:', error);
+      this.aSnackBar.open('Error durante la obtención de datos de grupo. Por favor, contacte con el administrador.', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-error']
+      });
+    });
+
+   
+
+
   }
 
-
+/*
   updateParticipantsOnForm(aExpense: IExpense){
     const arrParticipation =aExpense.participants;
  
@@ -248,6 +278,7 @@ export class ExpenseFormComponent {
     }
   }
 
+  
 
   updateParticipantsOnFormForANewExpense(aGroup:IGroup){
     const arrParticipationOnANewExpense =this.groupsService.getAllParticipantsWithinAGroup(this.user,aGroup);
@@ -274,61 +305,61 @@ export class ExpenseFormComponent {
     }
   }
 
-
+*/
 
 
   saveFormData(): void {
    
    if (this.modelForm.value.id) {
-      console.log(' saveFormData update '+JSON.stringify(this.modelForm.value));
+      console.log('--> saveFormData update ');
       //update
-      let aExpense = this.expensesService.update(this.modelForm.value, this.user);
-     /* this.expensesService
-        .update(this.modelForm.value)
-        .subscribe((data: IExpense) => {
-          console.log('expenseService.update returned ' + JSON.stringify(data));
-          let aExpense = data;
-          */
-          if (aExpense.id) {
-            this.messageService.add(
-              { severity: 'success', summary: 'Gasto actualizado correctamente', detail: 'Gasto ' +  aExpense.id +  ' ' + aExpense.concept +  ' ' +  aExpense.amount + ' actualizado correctamente' , key: 'br', life: 3000  }
-            );
-          
-            this.modelForm.reset();
-            if(this.parent ==='list')
-              this.router.navigate(['/expenses']);
-            else 
-              this.router.navigate(['/home']);
+      this.expensesService.update(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
+          console.log('expensesService.update returned ' + JSON.stringify(response));
+                          
+          this.modelForm.reset();
 
-            
-          } else {
-            this.messages.push(
-              { severity: 'error', summary: 'Error durante la actualización', detail: 'Por favor, contacte con el administrador' }
-            )
-          }
-        /* });*/
+          this.snackBar.open('Gasto actualizado correctamente', 'Cerrar', {
+              duration: 3000,
+              panelClass: ['snackbar-success']
+           });
+
+          if(this.parent ==='list')
+             this.router.navigate(['/expenses']);
+          else 
+             this.router.navigate(['/home']);
+
+        },
+        (error) => {
+            console.error('Error handler:', error);
+            this.aSnackBar.open('Error durante la actualización de gasto. Por favor, contacte con el administrador.', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-error']
+        });
+             
+            });
     } else {
-      console.log('saveFormData insert ' +this.modelForm.value);
-      //insert
-        let aExpense = this.expensesService.insert(this.modelForm.value, this.user);
-        /*.subscribe((data: IExpense) => {
-          console.log('expensesService.insert returned ' + JSON.stringify(data));
-          let aExpense = data;*/
+      console.log('--> saveFormData insert');
 
-          if (aExpense.id) {
-            this.messageService.add(
-              { severity: 'success', summary: 'Gasto creado correctamente', detail: 'Nuevo gasto ' +   aExpense.id +  ' ' + aExpense.concept +  ' ' +  aExpense.amount + ' creado correctamente' , key: 'br', life: 3000 }
-            );
+        //insert expense
+        this.expensesService.insert(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
+          console.log('expensesService.insert returned ' + JSON.stringify(response));
+        
+          this.snackBar.open('Nuevo gasto creado correctamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snackbar-success']
+          });
             
-            this.modelForm.reset();
-            this.router.navigate(['/expenses']);
-          } else {
-            this.messages.push(
-              { severity: 'error', summary: 'Error durante la creación', detail: 'Por favor, contacte con el administrador' }
-            )
-          }
-       /* });*/
-   /* }*/
+          this.modelForm.reset();
+          this.router.navigate(['/expenses']);
+           
+        },
+        (error) => {
+            console.error('Error handler:', error);
+            this.aSnackBar.open('Error durante la creación de nuevo gasto. Por favor, contacte con el administrador.', 'Cerrar', {
+              duration: 3000,
+              panelClass: ['snackbar-error']
+              });
+        });
   }
   }
 
@@ -340,10 +371,11 @@ export class ExpenseFormComponent {
       this.uploadedFiles.push(file);
   }
 
-  this.messageService.add({severity: 'info', summary: 'File Uploaded', detail: ''});
+  this.snackBar.open('Fichero añadido correctamente', 'Cerrar', {
+    duration: 3000,
+    panelClass: ['snackbar-success']
+  });
 }
 
- showBottomRight() {
-  this.messageService.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', key: 'br', life: 3000 });
-}
+
 }

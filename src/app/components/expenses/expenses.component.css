@@ -45,6 +45,11 @@
     
  }
 
+.details-form__form-warningMessage{
+    margin-top: 20px;
+    font-size: 1.1rem;
+}
+
  .details-form__row{
     padding: 10px;
 }

@@ -17,14 +17,14 @@ import { IApiResponse } from '../../interfaces/iapi-response';
 import { catchError } from 'rxjs';
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
 
-import { Message, MessageService } from 'primeng/api';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 @Component({
   selector: 'app-groups',
   standalone: true,
-  imports: [RouterLink, MatTableModule,MatButtonModule, MatMenuModule, MatIconModule],
-  providers: [MessageService],
+  imports: [RouterLink, MatTableModule,MatButtonModule, MatMenuModule, MatIconModule, MatSnackBarModule],
+  providers: [],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css'
 })
@@ -39,10 +39,10 @@ export class GroupsComponent {
   displayedColumns: string[] = ['name', 'description', 'options'];
   groupsInfo: IGroup[]|any;
 
-  messages: Message[] = [];
+  aSnackBar: MatSnackBar;
 
-  constructor(private messageService: MessageService){
-    this.messageService=messageService;
+  constructor( private snackBar: MatSnackBar){
+    this.aSnackBar=snackBar;
   }
 
 
@@ -54,6 +54,10 @@ export class GroupsComponent {
     },
     (error) => {
       console.error('Error handler:', error);
+      this.aSnackBar.open(`Error al cargar grupos. Por favor, contacte con el administrador.`, 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+      });
     });
  }
 
@@ -65,6 +69,10 @@ export class GroupsComponent {
   },
   (error) => {
     console.error('Error handler:', error);
+    this.aSnackBar.open(`Error al borrar grupos. Por favor, contacte con el administrador.`, 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-error']
+    });
   });
   }
 
