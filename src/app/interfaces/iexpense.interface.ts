@@ -2,18 +2,17 @@ import { IGroup } from "./igroup.interface";
 
 
 export interface IExpense {
-    id?: number;
-    group:IGroup;
+    expense_id?: number;
+    groups_id:number;
     concept: string;
     amount: number;
-    paidBy?: number;
-    createdBy: number;
-    expenseDate?: Date;
-    maxDate?:Date;
-    image?: string;
+    date?: Date;
+    max_date?:Date;
+    image_url?: string;
+    payer_user_id?: number;
     createdOn: Date;
-    expenseStatus:string;
-    participants: IExpenseParticipant[]
+    expenseStatus?:string;
+    participants?: IExpenseParticipant[]
    
 }
 

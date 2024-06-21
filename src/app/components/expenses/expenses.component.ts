@@ -37,7 +37,7 @@ export class ExpensesComponent {
 
   searchForm:FormGroup|any;
 
-  displayedColumns: string[] = ['group', 'concept', 'amount', 'paidBy', 'expenseStatus', 'expenseDate', 'options'];
+  displayedColumns: string[] = ['concept', 'amount', 'payer_user_id', 'date', 'max_date', 'options'];
 
   arrGroups: IGroup[]=[];
   expensesInfo: IExpense[]=[];
@@ -65,8 +65,6 @@ export class ExpensesComponent {
             selectedGroup: new FormControl(aGroup, [Validators.required])
           });
           this.searchData();
-        }else{
-          this.expensesInfo=this.expensesService.getAllExpensesWithinUserGroups(this.user);
         }
 
       });
@@ -83,7 +81,12 @@ searchData(){
     if(this.searchForm.value.selectedGroup!=null) {
       const {id}=this.searchForm.value.selectedGroup;
       console.log('ExpensesComponent searchData ' +id);
-      this.expensesInfo=this.expensesService.getAllExpensesWithinUserGroupsFilteredByGroup(this.user,id);
+
+      this.expensesService.getAllExpensesByGroup(id).subscribe((response: IApiResponse<IExpense[]>) => {
+        console.log("expensesService.getAllExpensesByGroup returned "+ JSON.stringify(response));
+        this.expensesInfo=  response.data;
+      });
+      
     }
 }
 
