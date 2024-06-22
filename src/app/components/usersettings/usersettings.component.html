@@ -10,53 +10,63 @@
           <div class="section-header">Editar</div>
           <hr class="section-divider" />
 
-          <div>
+          <div class="image-section">
+            <img
+              [src]="settingsForm.get('image_url')?.value"
+              alt="Imagen del Usuario"
+              class="user-image"
+            />
             <!-- Image Error Message -->
             @if (imageError) {
-              <div class="error-message">{{ imageError }}</div>
-            }
-            @if (!imageError && imageUrlValid) {
-              <img [src]="croppedImage || settingsForm.get('image_url')?.value" alt="Imagen del Usuario" class="user-image"/>
-            }
-
-            <!-- Image URL Field -->
-            <mat-form-field appearance="fill">
-              <mat-label>URL de la Imagen</mat-label>
-              @if (editField !== 'image_url') {
-                <input matInput id="image_url" [value]="user?.image_url" readonly (click)="enableEditing('image_url')" />
-              } @else {
-                <input matInput id="image_url" formControlName="image_url" (input)="validateImageUrl($event)" />
-                <button mat-icon-button type="button" (click)="saveField('image_url')">
-                  <mat-icon>save</mat-icon>
-                </button>
-              }
-            </mat-form-field>
-
-            @if (editField === 'image_url') {
-              <image-cropper
-                [imageBase64]="imageBase64"
-                [maintainAspectRatio]="true"
-                [aspectRatio]="1 / 1"
-                format="png"
-                (imageCropped)="imageCropped($event)"
-                (imageLoaded)="imageLoaded($event)"
-                (cropperReady)="cropperReady()"
-                (loadImageFailed)="loadImageFailed()">
-              </image-cropper>
+            <div class="error-message">{{ imageError }}</div>
             }
           </div>
+
+          <!-- Image URL Field -->
+          <mat-form-field appearance="fill">
+            <mat-label>URL de la Imagen</mat-label>
+            @if (editField !== 'image_url') {
+            <input
+              matInput
+              id="image_url"
+              [value]="user?.image_url"
+              readonly
+              (click)="enableEditing('image_url')"
+            />
+            } @else {
+            <input
+              matInput
+              id="image_url"
+              formControlName="image_url"
+              (input)="validateImageUrl($event)"
+            />
+            <button
+              mat-icon-button
+              type="button"
+              (click)="saveField('image_url')"
+            >
+              <mat-icon>save</mat-icon>
+            </button>
+            }
+          </mat-form-field>
 
           <!-- Name Field -->
           <div>
             <mat-form-field appearance="fill">
               <mat-label>Nombre</mat-label>
               @if (editField !== 'name') {
-                <input matInput id="name" [value]="user?.name" readonly (click)="enableEditing('name')" />
+              <input
+                matInput
+                id="name"
+                [value]="user?.name"
+                readonly
+                (click)="enableEditing('name')"
+              />
               } @else {
-                <input matInput id="name" formControlName="name" />
-                <button mat-icon-button type="button" (click)="saveField('name')">
-                  <mat-icon>save</mat-icon>
-                </button>
+              <input matInput id="name" formControlName="name" />
+              <button mat-icon-button type="button" (click)="saveField('name')">
+                <mat-icon>save</mat-icon>
+              </button>
               }
             </mat-form-field>
           </div>
@@ -66,12 +76,22 @@
             <mat-form-field appearance="fill">
               <mat-label>Email</mat-label>
               @if (editField !== 'email') {
-                <input matInput id="email" [value]="user?.email" readonly (click)="enableEditing('email')" />
+              <input
+                matInput
+                id="email"
+                [value]="user?.email"
+                readonly
+                (click)="enableEditing('email')"
+              />
               } @else {
-                <input matInput id="email" formControlName="email" type="email" />
-                <button mat-icon-button type="button" (click)="saveField('email')">
-                  <mat-icon>save</mat-icon>
-                </button>
+              <input matInput id="email" formControlName="email" type="email" />
+              <button
+                mat-icon-button
+                type="button"
+                (click)="saveField('email')"
+              >
+                <mat-icon>save</mat-icon>
+              </button>
               }
             </mat-form-field>
           </div>
@@ -81,12 +101,28 @@
             <mat-form-field appearance="fill">
               <mat-label>Contraseña</mat-label>
               @if (editField !== 'password') {
-                <input matInput id="password" type="password" value="********" readonly (click)="enableEditing('password')" />
+              <input
+                matInput
+                id="password"
+                type="password"
+                value="********"
+                readonly
+                (click)="enableEditing('password')"
+              />
               } @else {
-                <input matInput id="password" formControlName="password" type="password" />
-                <button mat-icon-button type="button" (click)="saveField('password')">
-                  <mat-icon>save</mat-icon>
-                </button>
+              <input
+                matInput
+                id="password"
+                formControlName="password"
+                type="password"
+              />
+              <button
+                mat-icon-button
+                type="button"
+                (click)="saveField('password')"
+              >
+                <mat-icon>save</mat-icon>
+              </button>
               }
             </mat-form-field>
           </div>
@@ -95,11 +131,15 @@
           <hr class="section-divider" />
 
           <div class="warning-message">
-            Si tiene algún grupo activo, su cuenta solo quedará inactiva. Para eliminar completamente la información de su cuenta, necesita tener todos los grupos archivados.
+            Si tiene algún grupo activo, su cuenta solo quedará inactiva. Para
+            eliminar completamente la información de su cuenta, necesita tener
+            todos los grupos archivados.
           </div>
 
           <div class="delete-section">
-            <button mat-raised-button color="warn" (click)="deleteUser()">Eliminar cuenta</button>
+            <button mat-raised-button color="warn" (click)="deleteUser()">
+              Eliminar cuenta
+            </button>
           </div>
         </form>
       </div>

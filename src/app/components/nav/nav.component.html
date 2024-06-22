@@ -1,22 +1,25 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button class="example-icon" routerLinkActive="active" [routerLink]="['/home']">
-    <mat-icon>home</mat-icon>
-  </button>
+  <a [routerLink]="['/home']">
+    <img src="assets/home-logo.png" alt="Home" class="home-logo" />
+  </a>
   <span>GG App</span>
-  <span class="example-spacer"></span>
-
-  <button mat-button routerLinkActive="active" [routerLink]="['/expenses']">Gastos</button>
-  <button mat-button routerLinkActive="active" [routerLink]="['/balance']">Balance</button>
-  <button mat-button routerLinkActive="active" [routerLink]="['/groups']">Grupos</button>
-  <button mat-icon-button>
-    <mat-icon svgIcon="bell"></mat-icon>
+  <button mat-button routerLinkActive="active" [routerLink]="['/expenses']">
+    💸 Gastos
   </button>
-  <button mat-icon-button routerLinkActive="active" [routerLink]="['/settings']">
-    <mat-icon svgIcon="settings" class="icon"></mat-icon>
+  <button mat-button routerLinkActive="active" [routerLink]="['/balance']">
+    📊 Balance
   </button>
-  <button mat-button (click)="logout()">Logout</button>
+  <button mat-button routerLinkActive="active" [routerLink]="['/groups']">
+    👥 Grupos
+  </button>
+  <button mat-button routerLinkActive="active" [routerLink] = "['/notifications']">🔔 Notificaciones</button>
+  <button mat-button routerLinkActive="active" [routerLink]="['/settings']"> ⚙️ Ajustes</button>
+  <button mat-button (click)="logout()">🚪 Log out</button>
+  <a routerLinkActive="active">
+    <img
+  [src]="userImageUrl"
+  alt="User Image"
+  class="user-image"
+/>
+  </a>
 </mat-toolbar>
-
-
-
-  

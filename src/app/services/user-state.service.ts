@@ -1,21 +1,35 @@
-import { Injectable, signal } from '@angular/core';
-import { IUser } from '../interfaces/iuser.interface';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ILoadedUserData } from '../interfaces/user/iloaded-user-data';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserStateService {
-  private userSignal = signal<IUser | null>(null);
+  private userSubject: BehaviorSubject<ILoadedUserData | null>;
+  public user$: Observable<ILoadedUserData | null>;
 
-  setUser(user: IUser) {
-    this.userSignal.set(user);
+  constructor() {
+    const userFromLocalStorage = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    this.userSubject = new BehaviorSubject<ILoadedUserData | null>(userFromLocalStorage);
+    this.user$ = this.userSubject.asObservable();
   }
 
-  getUser() {
-    return this.userSignal();
+  setUser(user: ILoadedUserData): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.userSubject.next(user);
   }
 
-  clearUser() {
-    this.userSignal.set(null);
+  getUser(): ILoadedUserData | null {
+    return this.userSubject.value;
+  }
+
+  getUserObservable(): Observable<ILoadedUserData | null> {
+    return this.user$;
+  }
+
+  clearUser(): void {
+    localStorage.removeItem('currentUser');
+    this.userSubject.next(null);
   }
 }
