@@ -55,6 +55,7 @@ export class ExpenseFormComponent {
   /* REACTIVE FORM */ 
   modelForm: FormGroup|any;
   isEmptyForm: boolean|any;
+  theGroupIfNoEmptyForm:number;
 
   /* DATA for the groups dropdown and the paid by dropdown and the uploaded files*/
   arrGroupsCreatedByUser: IGroup[]=[]; 
@@ -71,10 +72,11 @@ export class ExpenseFormComponent {
           group: new FormControl(null, [Validators.required]),
           concept: new FormControl(null, [Validators.required, Validators.minLength(3), Validators.maxLength(255)]),
           amount: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(100000)]),
-          paidBy: new FormControl(null, []),
+          paidBy: new FormControl(null, [Validators.required]),
           expenseDate: new FormControl(null, []), 
           maxDate: new FormControl(null, []), 
           expenseStatus: new FormControl(null, []) ,
+          image: new FormControl(null, [Validators.maxLength(255)])
           /*participants:  new FormArray([new FormGroup({
             participantName: new FormControl(null, [Validators.required]),
             percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
@@ -89,6 +91,7 @@ export class ExpenseFormComponent {
     );
 
     this.isEmptyForm = true;
+    this.theGroupIfNoEmptyForm=-1;
     this.aSnackBar=snackBar
   }
 
@@ -107,7 +110,7 @@ export class ExpenseFormComponent {
     //INICIALIZAMOS DATOS
     this.user = this.userService.getUserFromLocalStorage();
     
-    this.groupsService.getAllGroupsByUser(this.user).subscribe((response: IApiResponse<IGroup[]>) => {
+    this.groupsService.getAllGroupsByCreatorUser(this.user).subscribe((response: IApiResponse<IGroup[]>) => {
       console.log("groupsService.getAllGroupsByUser returned "+ JSON.stringify(response));
       this.arrGroupsCreatedByUser=  response.data;
     });
@@ -133,42 +136,44 @@ export class ExpenseFormComponent {
             this.expensesService.getById(Number.parseInt(selectedId)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IExpense>) => {
               console.log('groupsService.getById returned ' + JSON.stringify(response));
               const aExpense=response.data;
-              
               console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
-              console.log(" ngOnInit setting values for edit "+aExpense && aExpense.expense_id); 
-              if (aExpense && aExpense.expense_id){
-                  console.log(" ngOnInit setting values for edit "); 
+           
+              if (aExpense && aExpense.id && aExpense.group.id){
                   this.isEmptyForm = false;
-                  this.modelForm = new FormGroup({
-                      id: new FormControl(aExpense.expense_id, []),
-                      group: new FormControl(aExpense.groups_id,[]),
+                  this.theGroupIfNoEmptyForm=aExpense.group.id;
+                  //INICIALIZAMOS OPTIONS DE PAID bY DROPDOWN
+
+                  this.groupsService.getById(this.theGroupIfNoEmptyForm).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
+                    console.log('groupsService.getById returned ' + JSON.stringify(response));
+                    const arr=response.data.participants;
+                    if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
+                    let aExpDate=aExpense.expenseDate;
+                    if(aExpense.expenseDate!=undefined) aExpDate=new Date(aExpense.expenseDate.toString().slice(0,10));
+                    let aMaxDate=aExpense.maxDate;
+                    if(aExpense.maxDate!=undefined) aMaxDate=new Date(aExpense.maxDate.toString().slice(0,10));
+                    this.modelForm = new FormGroup({
+                      id: new FormControl(aExpense.id, []),
                       concept: new FormControl(aExpense.concept, [Validators.required,Validators.minLength(3), Validators.maxLength(255)]),
                       amount: new FormControl(aExpense.amount, [Validators.required, Validators.min(1), Validators.max(100000)]),
-                      paidBy: new FormControl(aExpense.payer_user_id, []),
-                      expenseDate: new FormControl(aExpense.date, []), 
-                      maxDate: new FormControl(aExpense.max_date, []), 
+                      paidBy: new FormControl(arr?.find(({id}) => id === aExpense.paidBy), [Validators.required]),
+                      expenseDate: new FormControl(aExpDate, []), 
+                      maxDate: new FormControl(aMaxDate, []), 
                       expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
-                      /*participants: new FormArray([new FormGroup({
-                        participantName: new FormControl(null, [Validators.required]),
+                      image: new FormControl(aExpense.image, [Validators.maxLength(255)]),
+                      participants: new FormArray([new FormGroup({
+                        participantName: new FormControl(null,[Validators.required]),
                         percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
                         amount: new FormControl(null, [Validators.required]),
                         expenseStatus: new FormControl(null, [])
                       })
-                      ])*/ 
+                      ]) 
                   }
                   /*,{
                     validators: [Validation.completenessOnPercetages('participants', 'percentage')]}*/
                   );
 
-                  //INICIALIZAMOS OPTIONS DE PAID bY DROPDOWN
-
-                  this.groupsService.getById(aExpense.groups_id).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
-                    console.log('groupsService.getById returned ' + JSON.stringify(response));
-                    const arr=response.data.participants;
-                    if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
-
                     //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
-                    //this.updateParticipantsOnForm(aExpense);
+                    this.updateParticipantsOnForm(aExpense);
 
                     console.log(" ngOnInit edit expense with num participants" + this.participants.length);
                     console.log(" ngOnInit edit modelForm "+ this.modelForm);
@@ -191,12 +196,6 @@ export class ExpenseFormComponent {
               });
             });
         } 
-      }else{
-
-        /* EN EL CASO DE NUEVO GASTO, EL FORM YA ESTÁ CREADO EN EL CONSTRUCTOR */
-        console.log(" ngOnInit add new ");
-        console.log(" ngOnInit init modelForm "+ this.modelForm);
-
       }
     });
  
@@ -234,8 +233,9 @@ export class ExpenseFormComponent {
   onChangeGroup(){
     console.log('onChangeGroup selected '+ this.modelForm.value?.group?.id);
     //update paidByOptions 
-    const theSelectedGroup=this.modelForm.value?.group;
-
+    const theSelectedGroup=this.modelForm.value?.group?.id;
+    if (theSelectedGroup==null) return;
+   
     this.groupsService.getById(Number.parseInt(theSelectedGroup)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IGroup>) => {
       console.log('groupsService.getById returned ' + JSON.stringify(response));
       const arr=response.data.participants;
@@ -257,17 +257,17 @@ export class ExpenseFormComponent {
 
   }
 
-/*
+
   updateParticipantsOnForm(aExpense: IExpense){
     const arrParticipation =aExpense.participants;
- 
+    if(arrParticipation==undefined) return;
     for (let i=0;i<arrParticipation.length;i++){
       console.log(" updateParticipantsOnForm with participant in index "+i +" participant " +arrParticipation[i].participantName);
       let participantItem = new FormGroup({
-        participantName: new FormControl(arrParticipation[i].participantName, [Validators.required]),
-        percentage: new FormControl(arrParticipation[i].percentage, [Validators.required]),
-        amount: new FormControl(arrParticipation[i].amount, [Validators.required,  Validators.max(100)]),
-        expenseStatus: new FormControl(arrParticipation[i].expenseStatus, []),
+        participantName: new FormControl({value: arrParticipation[i].participantName, disabled:true}, [Validators.required]),
+        percentage: new FormControl({value:arrParticipation[i].percentage, disabled:true}, [Validators.required]),
+        amount: new FormControl({value:arrParticipation[i].amount, disabled:true}, [Validators.required,  Validators.max(100)]),
+        expenseStatus: new FormControl({value:arrParticipation[i].expenseStatus, disabled:true}, []),
       });
 
       if(this.participants.at(i)!=undefined)
@@ -279,7 +279,7 @@ export class ExpenseFormComponent {
   }
 
   
-
+/*
   updateParticipantsOnFormForANewExpense(aGroup:IGroup){
     const arrParticipationOnANewExpense =this.groupsService.getAllParticipantsWithinAGroup(this.user,aGroup);
     if(arrParticipationOnANewExpense=== undefined) {
@@ -311,9 +311,10 @@ export class ExpenseFormComponent {
   saveFormData(): void {
    
    if (this.modelForm.value.id) {
-      console.log('--> saveFormData update ');
+      console.log('--> saveFormData update '+ JSON.stringify(this.modelForm.value));
+      console.log('--> saveFormData update '+this.modelForm.value?.paidBy?.id);
       //update
-      this.expensesService.update(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
+      this.expensesService.update(this.modelForm.value,this.theGroupIfNoEmptyForm, this.modelForm.value?.paidBy?.id).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
           console.log('expensesService.update returned ' + JSON.stringify(response));
                           
           this.modelForm.reset();
@@ -338,10 +339,10 @@ export class ExpenseFormComponent {
              
             });
     } else {
-      console.log('--> saveFormData insert');
+      console.log('--> saveFormData insert '+ JSON.stringify(this.modelForm.value));
 
         //insert expense
-        this.expensesService.insert(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
+        this.expensesService.insert(this.modelForm.value, this.modelForm.value?.group?.id, this.modelForm.value?.paidBy?.id).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
           console.log('expensesService.insert returned ' + JSON.stringify(response));
         
           this.snackBar.open('Nuevo gasto creado correctamente', 'Cerrar', {
