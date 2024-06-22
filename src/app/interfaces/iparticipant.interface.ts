@@ -4,6 +4,8 @@ export interface IParticipant {
     email: string;
     image?: string;
     state?: string;
+    status?: string;
+    
 }
 
 export interface IParticipantInvitations {
@@ -12,6 +14,7 @@ export interface IParticipantInvitations {
     email: string;
     image?: string;
     state?: string;
+    status?: string;
 }
 
 

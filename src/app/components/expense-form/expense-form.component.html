@@ -121,9 +121,10 @@
                                       
                                     <div class="details-form__row ">
                                         <div  class='details-form__form-field' >
-                                                <label for="expenseDate" class="details-form__form-field__label" >Fecha del pago</label>
+                                                <label for="expenseDate" class="details-form__form-field__label" >Fecha del gasto</label>
                                                 <p-calendar class="details-form__form-field__input"  
-                                                    id="expenseDate" 
+                                                    
+                                                    dateFormat="dd-mm-yy"
                                                     formControlName="expenseDate"/>
                                                    
                 
@@ -141,7 +142,8 @@
                                                 <label for="maxDate" class="details-form__form-field__label" >Fecha máxima para saldar cuentas</label>
                                                 <p-calendar 
                                                     class="details-form__form-field__input"  
-                                                    id="maxDate" 
+                                                   
+                                                    dateFormat="dd-mm-yy"
                                                     formControlName="maxDate"/>
                                                    
                 
@@ -153,25 +155,15 @@
                                         </div>
                                     </div>
 
-                                    
+                                   @if (!isEmptyForm)  {
                                     <div class="details-form__row ">
                                         <div  class='details-form__form-field' >
-                                                <label for="expenseStatus" class="details-form__form-field__label" >Estado del gasto</label>
-                                                <input 
-                                                    pInputText class="details-form__form-field__input"  
-                                                    id="expenseStatus" 
-                                                    formControlName="expenseStatus"/>
-                                                   
-                
-                                                    @if (validateField('expenseStatus', 'required')){
-                                                        <small id="expenseStatus-help"  class="details-form__form-field__smalllabel error">
-                                                            * Obligatorio
-                                                        </small>
-                                                    }
+                                                <label for="expenseStatus" class="details-form__form-field__label" >Estado del gasto : {{modelForm.get('expenseStatus').value}} </label>
+                                               
                                         </div>
                                     </div>
 
-
+                                }
                                    
                                 </div>             
                                               
@@ -180,18 +172,84 @@
                         
                         <div class="flex pt-4 justify-content-end">
                             <p-button 
-                                label="Repartir el gasto" [text]="true" (onClick)="nextCallback.emit()" />
+                                label="Agregar imagen comprobante" [text]="true" (onClick)="nextCallback.emit()" />
 
                              
                         </div>
                     </ng-template>
                 </p-stepperPanel>
-                <p-stepperPanel header="Repartición del gasto">
+
+                <p-stepperPanel header="Ticket o comprobante">
                     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" let-index="index">
                         <div class="flex flex-column h-12rem" >
                             <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
-                             
-                              
+                                <div class="container">
+                                    <div class="details-form__row">
+                                        <div  class='details-form__form-field ' >
+                                                  
+                                            <label for="name"  class="details-form__form-field__label">Image url</label>
+                                            <input 
+                                                pInputText  class="details-form__form-field__input" 
+                                                id="image" 
+                                                formControlName="image"/>
+                                                                  
+                                                
+                                                @if (validateField('image', 'maxlength')) {
+                                                    <small id="name-help"  class="details-form__form-field__smalllabel error">
+                                                        * Longitud máxima: 255 carácteres
+                                                    </small>
+                                                }                     
+                                            
+                                        </div>
+                                     </div>
+
+                                    <p-fileUpload 
+                                        name="demo[]" 
+                                        url="https://www.primefaces.org/cdn/api/upload.php" 
+                                        (onUpload)="onUpload($event)" 
+                                        [multiple]="false" 
+                                        accept="image/*" 
+                                        maxFileSize="1000000" class="p-link">
+                                            <ng-template pTemplate="content">
+                                                @for (file of uploadedFiles; track $index) {
+                                                    <li> 
+                                                        {{ file.name }} - {{ file.size }} bytes
+                                                        </li>
+                                                    }
+                                                
+                                            </ng-template>
+                                    </p-fileUpload>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex pt-4 justify-content-start ">
+                            <p-button  [text]="true"
+                                label="Volver" 
+                                (onClick)="prevCallback.emit()" />
+                        </div>
+
+                        <p-button  [text]="true"
+                        label="Ver repartición del gasto" 
+                       
+                        (onClick)="nextCallback.emit()" />
+
+                    </ng-template>
+                </p-stepperPanel>
+
+                <p-stepperPanel header="Ver repartición del gasto">
+                    <ng-template pTemplate="content" let-prevCallback="prevCallback"  let-index="index">
+                        <div class="flex flex-column h-12rem" >
+                            <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+
+                                @if(isEmptyForm){
+                                    <div class="details-form__row">
+                                        <div  class='details-form__form-field ' >
+                                            <small id="participants-help"  class="details-form__form-warningMessage">
+                                                Para ver la repartición del gasto, primero debes guardarlo
+                                            </small>
+                                        </div>
+                                    </div>   
+                                }@else{                              
                                     <div class="details-form__row">
                                         <div  class='details-form__form-field ' >
                                                 <label class="details-form__form-field__label" >Listado de participantes</label>
@@ -212,7 +270,7 @@
                                                    
                                         </div>
                                     </div>
-
+                                }
                             </div>
                         </div>
                         <div class="flex pt-4 justify-content-between">
@@ -220,42 +278,12 @@
                                 label="Volver" 
                                 
                                 (onClick)="prevCallback.emit()" />
-                            <p-button  [text]="true"
-                                label="Agregar imagen comprobante" 
-                               
-                                (onClick)="nextCallback.emit()" />
+                           
                         </div>
                     </ng-template>
                 </p-stepperPanel>
-                <p-stepperPanel header="Ticket o comprobante">
-                    <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
-                        <div class="flex flex-column h-12rem" >
-                            <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
-                                <p-fileUpload 
-                                    name="demo[]" 
-                                    url="https://www.primefaces.org/cdn/api/upload.php" 
-                                    (onUpload)="onUpload($event)" 
-                                    [multiple]="false" 
-                                    accept="image/*" 
-                                    maxFileSize="1000000" class="p-link">
-                                        <ng-template pTemplate="content">
-                                            @for (file of uploadedFiles; track $index) {
-                                                   <li> 
-                                                    {{ file.name }} - {{ file.size }} bytes
-                                                    </li>
-                                                }
-                                            
-                                        </ng-template>
-                                </p-fileUpload>
-                            </div>
-                        </div>
-                        <div class="flex pt-4 justify-content-start ">
-                            <p-button  [text]="true"
-                                label="Volver" 
-                                (onClick)="prevCallback.emit()" />
-                        </div>
-                    </ng-template>
-                </p-stepperPanel>
+            
+                
             </p-stepper>
             <footer>
             <div  class="details-form__submit"  > <button mat-flat-button color="primary" [disabled]="modelForm.invalid" >Guardar y cerrar</button></div>

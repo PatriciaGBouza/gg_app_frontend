@@ -18,7 +18,8 @@
                                     [options]="arrGroups" 
                                     formControlName="selectedGroup" 
                                     optionLabel="name" 
-                                    (onClick)="searchData()" />
+                                    (onClick)="searchData()" 
+                                    (onClear)="searchData()"/>
 
                     </div>
                 </form>
@@ -46,23 +47,29 @@
                 <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
                 </ng-container>
                 
+                <!-- Expense Status Column -->
+                <ng-container matColumnDef="expenseStatus">
+                    <th mat-header-cell *matHeaderCellDef> Estado </th>
+                    <td mat-cell *matCellDef="let element"> {{element.expenseStatus}} </td>
+                    </ng-container>
+
                 <!-- PaidBy Column -->
-                <ng-container matColumnDef="payer_user_id">
+                <ng-container matColumnDef="paidBy">
                 <th mat-header-cell *matHeaderCellDef> Pagado por </th>
-                <td mat-cell *matCellDef="let element"> {{element.payer_user_id}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.paidBy}} </td>
                 </ng-container>
 
                                          
                 <!-- Expense date Column -->
-                <ng-container matColumnDef="date">
+                <ng-container matColumnDef="expenseDate">
                 <th mat-header-cell *matHeaderCellDef> Fecha del gasto </th>
-                <td mat-cell *matCellDef="let element"> {{element.date| date: 'dd/MM/yyyy' }}  </td>
+                <td mat-cell *matCellDef="let element"> {{element.expenseDate| date: 'dd/MM/yyyy' }}  </td>
                 </ng-container>
 
                  <!-- Expense max date Column -->
-                <ng-container matColumnDef="max_date">
+                <ng-container matColumnDef="maxDate">
                 <th mat-header-cell *matHeaderCellDef> Fecha máxima para saldar el gasto </th>
-                <td mat-cell *matCellDef="let element"> {{element.max_date| date: 'dd/MM/yyyy' }}  </td>
+                <td mat-cell *matCellDef="let element"> {{element.maxDate| date: 'dd/MM/yyyy' }}  </td>
                 </ng-container>
             
                 <ng-container matColumnDef="options">
@@ -72,18 +79,15 @@
                         <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editexpense',element.expense_id ]" [queryParams]="{parent: 'list'}">
+                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editexpense',element.id ]" [queryParams]="{parent: 'list'}">
                         <mat-icon>edit</mat-icon>
                         <span>Edit</span>
                         </button>
                         <button mat-menu-item disabled>
                         <mat-icon>other</mat-icon>
-                        <span>Archivar grupo</span>
+                        <span>Actualizar estado a 'Pagado'</span>
                         </button>
-                        <button mat-menu-item>
-                        <mat-icon>last option</mat-icon>
-                        <span>Ir a gastos</span>
-                        </button>
+                      
                     </mat-menu>
                 </td>
                 </ng-container>

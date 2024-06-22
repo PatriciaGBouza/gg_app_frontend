@@ -5,6 +5,6 @@ export default class GlobalErrorHandler {
     // Handle the error here
     console.error('An error occurred:', error);
     // Optionally, re-throw the error or return a default value
-    return throwError(()=>new Error('Something went wrong'));
+    return throwError(()=>new Error(error.message));
   }
 }

@@ -25,6 +25,7 @@ import { IGroup } from '../../interfaces/igroup.interface';
 import { catchError } from 'rxjs';
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
 import StateTranslation from '../../utils/StateTranslation';
+import { MembershipService } from '../../services/membership.service';
 
 
 
@@ -51,6 +52,7 @@ export class GroupFormComponent {
   userService=inject(UserService);
   groupsService = inject(GroupsService);
   participantsService = inject(GroupParticipantsService);
+  membershipService = inject(MembershipService);
 
   /* REACTIVE FORM */ 
   modelForm: FormGroup|any;
@@ -62,6 +64,7 @@ export class GroupFormComponent {
   arrParticipants: IParticipant[]=[]; // the array of all the available participants
   participants: TreeNode[]=[];
   selectedParticipants: TreeNode[]=[]; // the selected participants of the tree node
+  keys:String[]|any;
   uploadedFiles: any[] = [];
 
 
@@ -150,14 +153,15 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
                 this.isEmptyForm = false;
                 
                 
-                let keys = aGroup.participants?.map(item => {
+                this.keys = aGroup.participants?.map(item => {
                   return item.id.toString()
                 });
             
-                //ESTE KEYS ES EL QUE USARIA PARA SABER QUÉ ID S TENIA DE INICIO
-                console.log(" ngOnInit edit group where selected participants are [" + keys+"]");
+                console.log(" ngOnInit edit group where selected participants are [" + this.keys+"]");
 
-                if(keys!=undefined) this.preselectParticipants(keys);
+                if(this.keys!=undefined) this.preselectParticipants();
+                if(aGroup.participants!=undefined) this.updateTreeNodeData(aGroup.participants);
+
                 this.modelForm = new FormGroup({
                     id: new FormControl(aGroup.id, []),
                     name: new FormControl(aGroup.name, [Validators.required, Validators.minLength(3),Validators.maxLength(255)]),
@@ -183,10 +187,6 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       
   }
   
-  updateNodeData(key:string, state:string){
-
-  }
-
 
   buildTreeNodeData(){
     console.log('buildTreeNodeData  of '+this.arrParticipants.length +" participants" );
@@ -202,10 +202,22 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       this.participants.push(newNode);
     }
   }
+
+  updateTreeNodeData(arrCurrentParticipants: IParticipant[]){
+    for (let i=0;i<arrCurrentParticipants.length;i++){
+      let aUserId=arrCurrentParticipants[i].id.toString();
+      console.log('updateTreeNodeData '+arrCurrentParticipants[i].status);
+      let aTreeNode=  this.getNodeWithKey(aUserId,this.participants);
+      
+      if(aTreeNode!=undefined){
+        aTreeNode.label=arrCurrentParticipants[i].name +' ( estado: ' +StateTranslation.getState(arrCurrentParticipants[i].status) + ' )';
+        console.log('updateTreeNodeData '+aTreeNode.label); 
+      }
+    }
+  }
  
-  preselectParticipants(keys: string[]){
-    console.log('Check as participant already assigned to group: ' +keys);
-    this.preselectNodes(keys,this.participants);
+  preselectParticipants(){
+    this.preselectNodes(this.keys);
  }
 
 
@@ -255,8 +267,9 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
 
 isTreeNode = (item: TreeNode | undefined): item is TreeNode => { return !!item }
 
-preselectNodes(keys: string[], allNodes: TreeNode[]): void {
-    this.selectedParticipants = keys.map(key => this.getNodeWithKey(key, allNodes)).filter(this.isTreeNode);
+
+preselectNodes(keys: string[]): void {
+  this.selectedParticipants = keys.map(key => this.getNodeWithKey(key, this.participants)).filter(this.isTreeNode);
 }
 
 getNodeWithKey(key: string, nodes: TreeNode[]): TreeNode | undefined {
@@ -293,12 +306,13 @@ getNodeWithKey(key: string, nodes: TreeNode[]): TreeNode | undefined {
 saveFormData(): void {
   
   if (this.modelForm.value.id) {
-     console.log('--> saveFormData update');
+     console.log('--> saveFormData update '+ JSON.stringify(this.modelForm.value));
        //update
        this.groupsService.update(this.modelForm.value).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
           console.log('groupsService.update returned ' + JSON.stringify(response));
            
-          this.saveFormDataSendInvitations (this.modelForm.value.id) ;
+          this.saveFormDataSendInvitations (this.modelForm.value.id, true) ;
+          
           this.modelForm.reset();
 
           this.aSnackBar.open('Grupo actualizado correctamente', 'Cerrar', {
@@ -323,7 +337,7 @@ saveFormData(): void {
         
        });
    } else {
-     console.log('--> saveFormData insert');
+     console.log('--> saveFormData insert '+ JSON.stringify(this.modelForm.value));
      
       //insert group
       let theNewId:any;
@@ -331,7 +345,7 @@ saveFormData(): void {
         console.log('groupsService.insert returned ' + JSON.stringify(response));
        
         theNewId=response.data.id;
-        this.saveFormDataSendInvitations (theNewId) ;
+        this.saveFormDataSendInvitations (theNewId, false) ;
         this.aSnackBar.open('Grupo creado correctamente', 'Cerrar', {
           duration: 3000,
           panelClass: ['snackbar-sucess']
@@ -350,25 +364,54 @@ saveFormData(): void {
 
  }
  
- saveFormDataSendInvitations(idGroup:number){
+
+
+ saveFormDataSendInvitations(idGroup:number, unassignParts:boolean){
    //insert invitations
-   this.groupsService.insertParticipants(idGroup,this.getArrraySelectedParticipants()).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
+  let arrParticipantsWithinGroup=this.getArrraySelectedParticipants();
+ 
+ 
+  this.groupsService.insertParticipants(idGroup,arrParticipantsWithinGroup).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IResponseId>) => {
      console.log('groupsService.insertParticipants returned ' + JSON.stringify(response));
-          
+  
      },
      (error) => {
-       // This block will only execute if catchError is used
        console.error('Error handler:', error);
        this.aSnackBar.open('Error durante la creación de invitaciones. Por favor, contacte con el administrador.', 'Cerrar', {
         duration: 3000,
         panelClass: ['snackbar-error']
         });
      }
-   );
+  );
+
+  if(unassignParts){
+    let arrParticipantsToBeUnassigned=this.getArrrayUnselectedParticipants(arrParticipantsWithinGroup);
+    for (let partUnass of arrParticipantsToBeUnassigned){
+      this.membershipService.deleteMembership(partUnass.id, idGroup).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<null>) => {
+        console.log('membershipService.deleteMembership returned ' + JSON.stringify(response));
+        
+      },
+      (error) => {
+        console.error('Error handler:', error);
+        this.aSnackBar.open('Error la desasignación de miembros. Por favor, contacte con el administrador.' + error, 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+        });
+      });
+    }
+  
+  
+  }
+
+
 }
+
+  
+
  
 
 getArrraySelectedParticipants():IParticipantInvitations[]{
+
    const arrPart:IParticipantInvitations[]=[];
    for (let selPart of this.selectedParticipants) {
      
@@ -384,15 +427,39 @@ getArrraySelectedParticipants():IParticipantInvitations[]{
        }else {
 
           let iSeletedKey=Number.parseInt(aSelectedKey);
-          console.log(' buildArrayParticipantsFromSelected key:'+iSeletedKey);
           let thePart=this.arrParticipants.find(({id}) => id === iSeletedKey );
-          console.log(' Saving as participant: '+thePart?.id +' ' +thePart?.name );
+          console.log(' Saving as a participant: '+thePart?.id +' ' +thePart?.name );
           if(thePart!=undefined)
             arrPart.push(thePart);
         }
-     }
+
+     } 
   }
    return arrPart;
+
  }
  
+
+
+getArrrayUnselectedParticipants(arrParticipantsWithinGroup:IParticipantInvitations[]):IParticipant[]{
+
+  const arrPartToBeRemoved:IParticipant[]=[];
+
+  for (let initialPart of this.keys) {
+    let thePart=this.arrParticipants.find(({id}) => id === Number.parseInt(initialPart) );
+    if(thePart!=undefined &&  !arrParticipantsWithinGroup.includes(thePart)){
+       console.log(' Removing as a participant:  '+thePart?.id +' ' +thePart?.name );
+         arrPartToBeRemoved.push(thePart);  
+    }
+  }
+  return arrPartToBeRemoved;
+
 }
+
+}
+
+
+
+
+
+
