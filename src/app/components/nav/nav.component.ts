@@ -37,7 +37,7 @@ export class NavComponent implements OnInit {
     iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
     private userStateService: UserStateService,
-    private userService: UserService
+    private userService: UserService,
   ) {
     iconRegistry.addSvgIcon(
       'settings',
@@ -71,6 +71,8 @@ export class NavComponent implements OnInit {
     }
   }
 
+  // get name
+  //get balance from Balance component
 
 
   toggleSidePanel() {

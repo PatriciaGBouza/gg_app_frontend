@@ -34,3 +34,8 @@
     border-width: 5px;
     border-style: dashed;
 }
+
+.group-list li {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
