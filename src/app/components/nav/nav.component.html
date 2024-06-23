@@ -1,25 +1,48 @@
 <mat-toolbar color="primary">
-  <a [routerLink]="['/home']">
-    <img src="assets/home-logo.png" alt="Home" class="home-logo" />
-  </a>
-  <span>GG App</span>
-  <button mat-button routerLinkActive="active" [routerLink]="['/expenses']">
-    💸 Gastos
-  </button>
-  <button mat-button routerLinkActive="active" [routerLink]="['/balance']">
-    📊 Balance
-  </button>
-  <button mat-button routerLinkActive="active" [routerLink]="['/groups']">
-    👥 Grupos
-  </button>
-  <button mat-button routerLinkActive="active" [routerLink] = "['/notifications']">🔔 Notificaciones</button>
-  <button mat-button routerLinkActive="active" [routerLink]="['/settings']"> ⚙️ Ajustes</button>
-  <button mat-button (click)="logout()">🚪 Log out</button>
-  <a routerLinkActive="active">
-    <img
-  [src]="userImageUrl"
-  alt="User Image"
-  class="user-image"
-/>
-  </a>
+  <div class="left-group">
+    <a [routerLink]="['/home']">
+      <img src="assets/home-logo.png" alt="Home" class="home-logo" />
+    </a>
+    <span class="app-title">GG App</span>
+    <button mat-button routerLinkActive="active" [routerLink]="['/groups']" title="Grupos">
+      <img src="assets/images/groups.png" alt="Grupos" class="groups-icon">
+    </button>
+    <button mat-button routerLinkActive="active" [routerLink]="['/expenses']" title="Gastos">
+      <img src="assets/images/money.png" alt="Gastos" class="money-icon">
+    </button>
+    <button mat-button routerLinkActive="active" [routerLink]="['/balance']" title="Balance">
+      <img src="assets/images/pie-chart.png" alt="Balance" class="balance-icon">
+    </button>
+  </div>
+  <div class="spacer"></div>
+  <div class="right-group">
+    <a (click)="toggleSidePanel()">
+      <img [src]="userImageUrl" alt="User Image" class="user-image"/>
+    </a>
+  </div>
 </mat-toolbar>
+
+<div class="side-panel" [class.open]="sidePanelOpen">
+  <div class="side-panel-header">
+    <img [src]="userImageUrl" alt="User Image" class="user-image">
+    <div class="user-info">
+      <span class="user-name">{{ userName }}</span>
+      <span class="user-balance">{{ userBalance }}</span>
+    </div>
+    <button mat-icon-button (click)="toggleSidePanel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="side-panel-content">
+    <button mat-button routerLinkActive="active" [routerLink]="['/notifications']" title="Notificaciones">
+      <img src="assets/images/bell.svg" alt="Notifications" class="bell-icon"> Notificaciones
+    </button>
+    <button mat-button routerLinkActive="active" [routerLink]="['/settings']" title="Ajustes">
+      <img src="assets/images/settings.svg" alt="Settings" class="settings-icon"> Ajustes
+    </button>
+    <div class="divider"></div>
+    <button mat-button (click)="logout()" title="Log out">
+      <img src="assets/images/logout.png" alt="Log out" class="logout-icon"> Log out
+    </button>
+  </div>
+</div>

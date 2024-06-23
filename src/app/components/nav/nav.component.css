@@ -1,11 +1,31 @@
-mat-toolbar {
+/* Shared Styles */
+mat-toolbar,
+.side-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 60px; /* Shared height */
+  padding: 0 20px; /* Shared padding */
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Nav Bar Specific Styles */
+mat-toolbar {
+  background-color: #3f51b5; /* Example background color for nav bar */
+}
+
+.left-group, .right-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spacer {
+  flex-grow: 1;
 }
 
 .app-title {
-  flex-grow: 1;
   margin-left: 10px;
 }
 
@@ -19,14 +39,105 @@ button[mat-button] {
   margin: 0 10px;
 }
 
-.user-image,
-.home-logo {
+.user-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   margin-left: 10px;
+  cursor: pointer;
 }
 
-.spacer {
+.home-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.bell-icon, .settings-icon, .logout-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.money-icon, .groups-icon, .balance-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+button:active {
+  transform: scale(0.95);
+  opacity: 0.7;
+}
+
+/* Side Panel*/
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-panel.open {
+  right: 0;
+}
+
+.side-panel-header .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 10px;
+}
+
+.side-panel-header .user-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.side-panel-header .user-balance {
+  font-size: 14px;
+  color: #666;
+  margin-top: 0; 
+}
+
+.side-panel-content {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.side-panel-content button {
+  justify-content: flex-start; /* Align the content to the left */
+  text-align: left; /* Ensure text aligns to the left */
+  width: 100%; /* Ensure the button takes the full width */
+}
+
+.divider {
+  border-bottom: 1px solid #e0e0e0;
+  margin: 10px 0;
 }

@@ -27,6 +27,9 @@ export class NavComponent implements OnInit {
   user: ILoadedUserData | null = null;
   userId: string | null = null;
   userImageUrl: string = 'assets/user_default.png';
+  sidePanelOpen = false;
+  userName = 'John Doe';
+  userBalance = '$1000'; 
 
   constructor(
     public authService: AuthService,
@@ -66,6 +69,12 @@ export class NavComponent implements OnInit {
     } else {
       this.userImageUrl = 'assets/user_default.png';
     }
+  }
+
+
+
+  toggleSidePanel() {
+    this.sidePanelOpen = !this.sidePanelOpen;
   }
 
   logout(): void {
