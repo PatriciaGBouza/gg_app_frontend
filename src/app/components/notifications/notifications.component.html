@@ -1,0 +1,62 @@
+<div class="notifications-container">
+  <div class="header">
+    <h2>Notificaciones</h2>
+    <ng-container *ngIf="currentTab === 'inbox'">
+      <button class="mark-read" (click)="markAllAsRead()">Marcar todas como leídas</button>
+    </ng-container>
+  </div>
+  <div class="tabs">
+    <button class="tab" [class.active]="currentTab === 'inbox'" (click)="showTab('inbox')">No leídos</button>
+    <button class="tab" [class.active]="currentTab === 'general'" (click)="showTab('general')">Todo lo demás</button>
+  </div>
+  <ng-container *ngIf="notifications$ | async as response">
+    @if (currentTab === 'inbox') {
+      @if(getUnreadNotifications().length === 0){
+          <p>{{ message }}</p>
+      }  
+      @for (notification of notifications; track notification.id) {
+        @if(notification.status === 'Unread'){
+          <div class="notification-item" (click)="markAsRead(notification)">
+            <img [src]="getNotificationImage(notification)" alt="Imagen de notificación" class="notification-image">
+            <div class="notification-content">
+              <p class="notification-title">
+                {{ notification.title }}
+                <span class="notification-time-since">{{ getTimeSince(notification.date) }}</span>
+              </p>
+              <p class="notification-description">{{ notification.description }}</p>
+              <div class="notification-dot"></div>
+              @if (notification.title.includes('invitado')) {
+                <div class="notification-actions">
+                  <button class="accept" (click)="acceptInvitation(notification)">Aceptar</button>
+                  <button class="decline" (click)="declineInvitation(notification)">Rechazar</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
+    @if (currentTab === 'general') {
+      @for (notification of notifications; track notification.id) {
+        @if(notification.status === 'Read'){
+        <div class="notification-item" (click)="markAsRead(notification)">
+          <img [src]="getNotificationImage(notification)" alt="Imagen de notificación" class="notification-image">
+          <div class="notification-content">
+            <p class="notification-title">
+              {{ notification.title }}
+              <span class="notification-time-since">{{ getTimeSince(notification.date) }}</span>
+            </p>
+            <p class="notification-description">{{ notification.description }}</p>
+            @if (notification.title.includes('invitado')) {
+              <div class="notification-actions">
+                <button class="accept" (click)="acceptInvitation(notification)">Aceptar</button>
+                <button class="decline" (click)="declineInvitation(notification)">Rechazar</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      }
+    }
+  </ng-container>
+</div>

@@ -1,18 +1,27 @@
-
-
 <section>
-    <div class="container " >
-        <div class="row">
-            <div class="header">
-                <div class="header__top">Tu balance </div>
-            </div>
+    <div class="container">
+      <div class="row">
+        <div class="header">
+          <div class="header__top">Tu balance </div>
         </div>
-        <div class="row">
-            <div class="data">
-                <div class="data__chart">
-                    <p-chart  type="doughnut" [data]="data" [options]="options" ></p-chart>
-                </div>
+      </div>
+      <div class="row">
+        <div class="left-column">
+          <ul class="group-list">
+            @for(group of groups; track group.id){
+                <li (click)="onGroupClick(group)">{{ group.name }}</li>
+            }
+          </ul>
+        </div>
+        <div class="right-column">
+            
+          <div class="data">
+            <div class="data__chart">
+              <p-chart type="doughnut" [data]="data" [options]="options"></p-chart>
             </div>
-         </div>
+          </div>
+        </div>
+      </div>
     </div>
-</section>
+  </section>
+  

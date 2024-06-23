@@ -11,6 +11,7 @@ import { authGuard } from './guards/auth.guard';
 import { nonAuthGuard } from './guards/non-auth.guard';
 import { UserSettingsComponent} from './components/usersettings/usersettings.component';
 import { ExpenseFormComponent } from './components/expense-form/expense-form.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
 
 export const routes: Routes = [
 { path: '', pathMatch: 'full', component: PrincipalComponent },
@@ -25,5 +26,6 @@ export const routes: Routes = [
 { path: 'login', component: SignInComponent, canActivate: [nonAuthGuard] },
 { path: 'register', component: SignUpComponent, canActivate: [nonAuthGuard] },
 { path: 'settings', component: UserSettingsComponent, canActivate: [authGuard] },
+{ path: 'notifications', component: NotificationsComponent, canActivate: [authGuard] },
 { path: '**', redirectTo: '' }
 ];
