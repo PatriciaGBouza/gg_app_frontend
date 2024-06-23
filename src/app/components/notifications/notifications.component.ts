@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NotificationsService } from '../../services/notifications/notifications.service';
 import { Observable, tap } from 'rxjs';
 import { IApiResponse } from '../../interfaces/iapi-response';
-import { CommonModule, AsyncPipe} from '@angular/common';
+import { CommonModule} from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -19,7 +20,10 @@ export class NotificationsComponent implements OnInit {
   notifications: any[] = [];
   message: string = 'No hay nuevos notificaciones!';
 
-  constructor(private notificationsService: NotificationsService) {}
+  constructor(
+    private notificationsService: NotificationsService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.notifications$ = this.notificationsService.getNotifications().pipe(
@@ -57,12 +61,6 @@ export class NotificationsComponent implements OnInit {
     return notification;
   }
 
-  handleNotificationClick(notification: any): void {
-    notification.status = 'Read';
-    setTimeout(() => {
-      // Re-render or trigger any change detection if necessary
-    }, 200); // Animation duration
-  }
 
   getNotificationImage(notification: any): string {
     if (notification.group_id && notification.expense_id) {
@@ -75,12 +73,21 @@ export class NotificationsComponent implements OnInit {
   }
 
   acceptInvitation(notification: any): void {
-    // Logic for accepting the invitation
+// logic
+    this.snackBar.open('Invitación aceptada', 'Cerrar', { duration: 3000 });
+    //delete notification + send new one
+    this.notifications = this.notifications.filter(n => n.id !== notification.id);
+    this.updateMessage();
   }
 
   declineInvitation(notification: any): void {
-    // Logic for declining the invitation
+//logic
+    this.snackBar.open('Invitación rechazada', 'Cerrar', { duration: 3000 });
+    // delete notification
+    this.notifications = this.notifications.filter(n => n.id !== notification.id);
+    this.updateMessage();
   }
+  
 
   getTimeSince(date: string): string {
     const now = new Date();
