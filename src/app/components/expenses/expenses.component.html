@@ -71,6 +71,20 @@
                 <th mat-header-cell *matHeaderCellDef> Fecha máxima para saldar el gasto </th>
                 <td mat-cell *matCellDef="let element"> {{element.maxDate| date: 'dd/MM/yyyy' }}  </td>
                 </ng-container>
+                 <!-- Personal Amount to Pay Column -->
+                <ng-container matColumnDef="Tu parte">
+                <th mat-header-cell *matHeaderCellDef>Tu parte</th>
+                <td mat-cell *matCellDef="let element">{{ element.myAmount }}</td>
+                </ng-container>
+
+                <!-- Personal Status Column -->
+                <ng-container matColumnDef="Tu estado">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element">
+                <span>{{element.myStatus}}
+                </span>
+            </td>
+                </ng-container>
             
                 <ng-container matColumnDef="options">
                 <th mat-header-cell *matHeaderCellDef>  </th>
@@ -79,13 +93,17 @@
                         <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                        <button mat-menu-item routerLinkActive="active" [routerLink]="['/editexpense',element.id ]" [queryParams]="{parent: 'list'}">
+                        <button *ngIf="isAdmin((element.group))" mat-menu-item routerLinkActive="active" [routerLink]="['/editexpense',element.id ]" [queryParams]="{parent: 'list'}">
                         <mat-icon>edit</mat-icon>
                         <span>Edit</span>
                         </button>
-                        <button mat-menu-item disabled>
-                        <mat-icon>other</mat-icon>
-                        <span>Actualizar estado a 'Pagado'</span>
+                        <button *ngIf="!isPayer(element.paidBy)" mat-menu-item (click)="updateStatusToPaid(element)">
+                        <mat-icon>euro</mat-icon>
+                        <span>Pagar</span>
+                        </button>
+                        <button *ngIf="isAdmin((element.group))" mat-menu-item (click)="deleteExpense(element)">
+                            <mat-icon>delete</mat-icon>
+                            <span>Delete</span>
                         </button>
                       
                     </mat-menu>

@@ -12,7 +12,9 @@ export interface IExpense {
     paidBy?: number;
     createdOn?: Date;
     expenseStatus?:string;
-    participants?: IExpenseParticipant[]
+    participants?: IExpenseParticipant[];
+    myAmount?: number;
+    myStatus?: string;
   
 }
 

@@ -6,6 +6,7 @@ import { IApiResponse } from '../interfaces/iapi-response';
 import { Observable } from 'rxjs';
 import { IResponseId } from '../interfaces/iapi-responseId';
 import { IUser } from '../interfaces/iuser.interface';
+import { UserService } from './user.service';
 
 
 @Injectable({
@@ -21,7 +22,7 @@ export class ExpensesService {
   //private arrExpenses: IExpense[]= EXPENSES;
 
 
-  constructor() { }
+  constructor(private userService: UserService) { }
 
   getAllExpensesByGroup(idGroup: number): Observable<IApiResponse<IExpense[]>>{
     return this.httpClient.get<IApiResponse<IExpense[]>>(`${this.url}/group/${idGroup}`);
@@ -67,10 +68,41 @@ export class ExpensesService {
     console.log('expensesService.update with BODY '+ JSON.stringify(theExpense));
     return this.httpClient.put<IApiResponse<null>>(`${this.url}/update/${aExpense.id}`,theExpense);
   }
+//### Delete Expense by expense_id DELETE {{HOST}}/api/expenses/:groups_id/:expenses_id
 
-  delete(id: number): Observable<IApiResponse<any>> {
-    return this.httpClient.delete<IApiResponse<any>>(`${this.url}/${id}`);
+delete(groupId: number, expenseId: number): Observable<IApiResponse<any>> {
+  return this.httpClient.delete<IApiResponse<any>>(`${this.url}/${groupId}/${expenseId}`);
+}
+
+  // paying your expense assignment
+  private userId = this.userService.getUserIdFromLocalStorage();
+
+  payExpenseAssignment(expenses_id: number, groups_id: number, cost: number, status: string): Observable<IApiResponse<any>> {
+    const payload = {
+      users_id: this.userId,
+      expenses_id,
+      groups_id,
+      cost,
+      status
+    };
+    return this.httpClient.post<IApiResponse<any>>(`${this.url}/payment`, payload);
   }
+  // to get personal amount and status of expense_assignment
+  // getExpenseById(expenseId: number): Observable<{ personalAmount: number, personalStatus: string }> {
+  //   return this.httpClient.get<IApiResponse<IExpense>>(`${this.url}/${expenseId}`).pipe(
+  //     map(response => {
+  //       const participant = response.data.participants.find(p => p.idParticipant === this.userId);
+  //       return {
+  //         personalAmount: participant ? participant.amount : 0,
+  //         personalStatus: participant ? participant.expenseStatus : 'Not Paid'
+  //       };
+  //     })
+  //   );
+  // }
+  
+
+
+
 
  
 

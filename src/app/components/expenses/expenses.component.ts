@@ -10,7 +10,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -21,11 +21,14 @@ import { IApiResponse } from '../../interfaces/iapi-response';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { catchError } from 'rxjs';
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
+//
+import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-expenses',
   standalone: true,
-  imports: [RouterLink,MatTableModule,MatButtonModule, MatMenuModule, MatIconModule, DatePipe, ReactiveFormsModule,IconFieldModule,InputIconModule,InputTextModule,DropdownModule,MatSnackBarModule],
+  imports: [RouterLink,MatTableModule,MatButtonModule, MatMenuModule, MatIconModule, DatePipe, ReactiveFormsModule,IconFieldModule,InputIconModule,InputTextModule,DropdownModule,MatSnackBarModule, CommonModule],
   templateUrl: './expenses.component.html',
   styleUrl: './expenses.component.css'
 })
@@ -41,7 +44,7 @@ export class ExpensesComponent {
 
   searchForm:FormGroup|any;
 
-  displayedColumns: string[] = ['concept', 'amount', 'paidBy', 'expenseDate', 'maxDate','expenseStatus' ,'options'];
+  displayedColumns: string[] = ['concept', 'amount', 'paidBy', 'expenseDate', 'maxDate','expenseStatus', 'Tu parte','Tu estado','options'];
 
   arrGroups: IGroup[]=[];
   expensesInfo: IExpense[]=[];
@@ -104,6 +107,15 @@ export class ExpensesComponent {
       
     }
 
+
+    isPayer(paidById: number): boolean {
+      return this.user.id === paidById;
+    }
+  
+    isAdmin(group: IGroup): boolean {
+      return this.user.id === group.createdBy;
+    }
+
 searchData(){
     console.log('ExpensesComponent searchData ' + JSON.stringify(this.searchForm.value));
     this.expensesInfo=[];
@@ -142,5 +154,83 @@ reloadExpensesDataWithExpensesByUser():void{
     });
   });
 }
+
+
+
+//paying expense assignment
+//I need to send personal expense amount 2.
+//show personal expense amount in the table 1.
+
+async updateStatusToPaid(expense: IExpense): Promise<void> {
+  const groupId = expense.group?.id;
+
+  console.log('Expense ID:', expense.id);
+  console.log('Group ID:', groupId);
+  
+  if (expense.id == null || groupId == null || expense.myAmount == null) {
+    this.aSnackBar.open('ID de gasto o ID de grupo no encontrado.', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-error']
+    });
+    return;
+  }
+
+  try {
+    await firstValueFrom(this.expensesService.payExpenseAssignment(expense.id, groupId, expense.myAmount, 'Reported'));
+    this.aSnackBar.open('Estado actualizado a "Pagado".', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-success']
+    });
+    this.searchData();
+  } catch (error) {
+    console.error('Error handler:', error);
+    this.aSnackBar.open('Error al actualizar el estado. Por favor, contacte con el administrador.', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-error']
+    });
+  }
+}
+
+//delete expense
+
+async deleteExpense(expense: IExpense): Promise<void> {
+  console.log('Expense Object:', expense); // Debugging statement
+
+  const groupId = expense.group?.id;
+
+  console.log('Expense ID:', expense.id);
+  console.log('Group ID:', groupId);
+
+  if (groupId == null || expense.id == null) {
+    this.aSnackBar.open('ID de gasto o ID de grupo no encontrado.', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-error']
+    });
+    return;
+  }
+
+  try {
+    await firstValueFrom(this.expensesService.delete(groupId, expense.id));
+    this.aSnackBar.open('Gasto eliminado correctamente.', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-success']
+    });
+    this.searchData();
+  } catch (error) {
+    console.error('Error handler:', error);
+    this.aSnackBar.open('Error al eliminar el gasto. Por favor, contacte con el administrador.', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['snackbar-error']
+    });
+  }
+}
+
+
+
+
+
+
+
+
 
 }
