@@ -9,6 +9,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ILoadedUserData } from '../../interfaces/user/iloaded-user-data';
 import { UserStateService } from '../../services/user-state.service';
 import { UserService } from '../../services/user.service';
+import { BalanceService } from '../../services/balance.service';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-nav',
@@ -18,18 +20,21 @@ import { UserService } from '../../services/user.service';
     MatButtonModule,
     MatIconModule,
     RouterLink,
-    RouterLinkActive,
+    RouterLinkActive
   ],
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css',
+  providers: [DecimalPipe]
 })
 export class NavComponent implements OnInit {
   user: ILoadedUserData | null = null;
   userId: string | null = null;
   userImageUrl: string = 'assets/user_default.png';
   sidePanelOpen = false;
-  userName = 'John Doe';
-  userBalance = '$1000'; 
+  userName: string = 'Usuario Feliz';
+  userBalance = 0;
+  updatedBalance: string = '';
+
 
   constructor(
     public authService: AuthService,
@@ -38,6 +43,8 @@ export class NavComponent implements OnInit {
     sanitizer: DomSanitizer,
     private userStateService: UserStateService,
     private userService: UserService,
+    private balanceService: BalanceService,
+    private decimalPipe: DecimalPipe
   ) {
     iconRegistry.addSvgIcon(
       'settings',
@@ -54,6 +61,8 @@ export class NavComponent implements OnInit {
       this.user = user;
       this.updateUserImageUrl();  // Update image URL whenever user data changes
     });
+    this.userName = this.userService.getUserName() || 'Usuario Feliz';
+    this.loadUserBalance();
   }
 
   private loadUserFromLocalStorage(): void {
@@ -72,8 +81,17 @@ export class NavComponent implements OnInit {
   }
 
   // get name
-  //get balance from Balance component
 
+
+  //get balance from Balance component
+  private loadUserBalance(): void {
+    this.balanceService.getTotalBalance().subscribe(totalAmount => {
+      this.userBalance = totalAmount;
+      this.updatedBalance = this.decimalPipe.transform(totalAmount, '1.2-2') + ' €';
+      //{{ number | number : '1.2-2'}}
+
+    });
+  }
 
   toggleSidePanel() {
     this.sidePanelOpen = !this.sidePanelOpen;

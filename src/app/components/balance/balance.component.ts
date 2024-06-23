@@ -16,6 +16,7 @@ export class BalanceComponent implements OnInit {
   groups: { id: number, name: string }[] = [];
   groupId: number = 5; // groupid
   groupName: string = '';
+  totalAmount: number = 0;
 
   constructor(private balanceService: BalanceService) {}
 
@@ -28,7 +29,8 @@ export class BalanceComponent implements OnInit {
 
     // Fetch all groups by user
     this.balanceService.getAllGroupsByUser().subscribe(groupResponse => {
-      this.groups = groupResponse;
+      this.groups = groupResponse.groups;
+      this.totalAmount = groupResponse.totalAmount;
     });
   }
 
