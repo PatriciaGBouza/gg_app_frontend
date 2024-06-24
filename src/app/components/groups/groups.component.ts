@@ -8,7 +8,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
-
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { IGroup } from '../../interfaces/igroup.interface';
 import { IApiResponse } from '../../interfaces/iapi-response';
@@ -17,7 +17,7 @@ import { IApiResponse } from '../../interfaces/iapi-response';
 import { catchError } from 'rxjs';
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
 
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 
 
 @Component({
