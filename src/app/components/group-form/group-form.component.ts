@@ -5,19 +5,20 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
 import { GroupsService } from '../../services/groups.service';
 import { GroupParticipantsService } from '../../services/group-participants.service';
+import { MembershipService } from '../../services/membership.service';
+import { UserService } from '../../services/user.service';
 
 import { MatButtonModule} from '@angular/material/button';
 import { StepperModule } from 'primeng/stepper';
-import { Message, TreeNode } from 'primeng/api';
+import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { InputTextModule } from 'primeng/inputtext';
 import { FileUploadEvent, FileUploadModule } from 'primeng/fileupload';
 import { TableModule } from 'primeng/table';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
-
 import { IParticipant, IParticipantInvitations } from '../../interfaces/iparticipant.interface';
-import { UserService } from '../../services/user.service';
+
 import { IApiResponse } from '../../interfaces/iapi-response';
 import { IResponseId } from '../../interfaces/iapi-responseId';
 import { IGroup } from '../../interfaces/igroup.interface';
@@ -25,7 +26,7 @@ import { IGroup } from '../../interfaces/igroup.interface';
 import { catchError } from 'rxjs';
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
 import StateTranslation from '../../utils/StateTranslation';
-import { MembershipService } from '../../services/membership.service';
+
 
 
 
@@ -157,7 +158,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
                   return item.id.toString()
                 });
             
-                console.log(" ngOnInit edit group where selected participants are [" + this.keys+"]");
+                console.log("Selected participants are [" + this.keys+"]");
 
                 if(this.keys!=undefined) this.preselectParticipants();
                 if(aGroup.participants!=undefined) this.updateTreeNodeData(aGroup.participants);

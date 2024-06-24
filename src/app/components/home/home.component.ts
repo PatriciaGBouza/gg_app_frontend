@@ -2,6 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { GroupsService } from '../../services/groups.service';
+import { UserService } from '../../services/user.service';
+import { ExpensesService } from '../../services/expenses.service';
 
 import { CarouselModule } from 'primeng/carousel';
 import { PanelModule } from 'primeng/panel';
@@ -11,11 +13,10 @@ import { ChartModule} from 'primeng/chart';
 import { IExpense } from '../../interfaces/iexpense.interface';
 import { IGroup } from '../../interfaces/igroup.interface';
 import { IUser } from '../../interfaces/iuser.interface';
-
 import { BalanceComponent } from '../balance/balance.component';
+
 import { IApiResponse } from '../../interfaces/iapi-response';
-import { UserService } from '../../services/user.service';
-import { ExpensesService } from '../../services/expenses.service';
+
 
 
 

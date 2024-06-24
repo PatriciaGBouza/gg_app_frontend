@@ -2,13 +2,12 @@ import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import Validation from '../../utils/Validation';
 
 import { ExpensesService } from '../../services/expenses.service';
 import { GroupsService } from '../../services/groups.service';
 
 import { MatButtonModule } from '@angular/material/button';
-
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FileUploadEvent, FileUploadModule } from 'primeng/fileupload';
 import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
@@ -21,10 +20,11 @@ import { IParticipant } from '../../interfaces/iparticipant.interface';
 import { IGroup } from '../../interfaces/igroup.interface';
 import { UserService } from '../../services/user.service';
 import { IApiResponse } from '../../interfaces/iapi-response';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { IResponseId } from '../../interfaces/iapi-responseId';
+
 import GlobalErrorHandler from '../../utils/GlobalErrorHandler';
 import { catchError } from 'rxjs';
-import { IResponseId } from '../../interfaces/iapi-responseId';
+
 
 
 
@@ -78,17 +78,8 @@ export class ExpenseFormComponent {
           maxDate: new FormControl(null, []), 
           expenseStatus: new FormControl(null, []) ,
           image: new FormControl(null, [Validators.maxLength(255)])
-          /*participants:  new FormArray([new FormGroup({
-            participantName: new FormControl(null, [Validators.required]),
-            percentage: new FormControl(null, [Validators.required,  Validators.min(1), Validators.max(100)]),
-            amount: new FormControl(null, [Validators.required]),
-            expenseStatus: new FormControl(null, []) })
-          ]) */
+          
       }
-      /*,{
-        validators: [Validation.completenessOnPercetages('participants', 'percentage')]
-      }*/
-        //validators: [Validation.noNaNValidator('amount', 'noNan')]
     );
 
     this.isEmptyForm = true;
@@ -102,8 +93,6 @@ export class ExpenseFormComponent {
   ngOnInit(){
       
     this.activatedRoute.queryParamMap.subscribe((paramMap) => {
-      // read param from paramMap
-      // TO-DO: TRY TO CHANGE THIS AND REPLACE WITH STATES, also in group form
       this.parent = paramMap.get('parent');
       this.parent ??='home';
 
@@ -135,10 +124,9 @@ export class ExpenseFormComponent {
 
             //GET DATOS DE GASTO
             this.expensesService.getById(Number.parseInt(selectedId)).pipe(catchError(GlobalErrorHandler.catchErrorFunction)).subscribe((response: IApiResponse<IExpense>) => {
-              console.log('groupsService.getById returned ' + JSON.stringify(response));
+              console.log('expensesService.getById returned ' + JSON.stringify(response));
               const aExpense=response.data;
-              console.log(" ngOnInit edit "+ JSON.stringify(aExpense));
-           
+      
               if (aExpense && aExpense.id && aExpense.group.id){
                   this.isEmptyForm = false;
                   this.theGroupIfNoEmptyForm=aExpense.group.id;
@@ -168,16 +156,11 @@ export class ExpenseFormComponent {
                         expenseStatus: new FormControl(null, [])
                       })
                       ]) 
-                  }
-                  /*,{
-                    validators: [Validation.completenessOnPercetages('participants', 'percentage')]}*/
-                  );
+                  });
 
                     //INICIALIZAMOS DATOS : ARRAY PARTICIPANTES DEL GRUPO DEL GASTO
                     this.updateParticipantsOnForm(aExpense);
 
-                    console.log(" ngOnInit edit expense with num participants" + this.participants.length);
-                    console.log(" ngOnInit edit modelForm "+ this.modelForm);
                   },
                    (error) => {
                     console.error('Error handler:', error);
@@ -241,17 +224,14 @@ export class ExpenseFormComponent {
       console.log('groupsService.getById returned ' + JSON.stringify(response));
       const arr=response.data.participants;
       if (arr!=undefined) this.arrParticipantsWithinAGroup=arr;
-
-      //update participantsOptions 
-      //this.updateParticipantsOnFormForANewExpense( this.modelForm.value.group);
-   },
-    (error) => {
+     },
+      (error) => {
       console.error('Error handler:', error);
       this.aSnackBar.open('Error durante la obtención de datos de grupo. Por favor, contacte con el administrador.', 'Cerrar', {
           duration: 3000,
           panelClass: ['snackbar-error']
       });
-    });
+      });
 
    
 
@@ -286,35 +266,6 @@ export class ExpenseFormComponent {
   }
 
   
-/*
-  updateParticipantsOnFormForANewExpense(aGroup:IGroup){
-    const arrParticipationOnANewExpense =this.groupsService.getAllParticipantsWithinAGroup(this.user,aGroup);
-    if(arrParticipationOnANewExpense=== undefined) {
-        this.participants.clear();
-        console.log("  participants form cleared");
-    }else{
-      this.participants.clear();
-      for (let i=0;i<arrParticipationOnANewExpense.length;i++){
-        console.log(" updateParticipantsOnFormForANewExpense with participant in index "+i +" participant " +arrParticipationOnANewExpense[i].name);
-        let participantItem = new FormGroup({
-          participantName: new FormControl(arrParticipationOnANewExpense[i].name, [Validators.required]),
-          percentage: new FormControl(0, [Validators.required]),
-          amount: new FormControl(0, [Validators.required,  Validators.max(100)]),
-          expenseStatus: new FormControl('Reported', []),
-        });
-
-        if(this.participants.at(i)!=undefined)
-          this.participants.setControl(i,participantItem);
-        else          
-        // Add the new form group to the FormArray
-        this.participants.insert(i,participantItem);
-      }
-    }
-  }
-
-*/
-
-
   saveFormData(): void {
    
    if (this.modelForm.value.id) {
@@ -370,9 +321,6 @@ export class ExpenseFormComponent {
         });
   }
   }
-
- 
-
 
  onUpload(event:FileUploadEvent) {
   for(let file of event.files) {
