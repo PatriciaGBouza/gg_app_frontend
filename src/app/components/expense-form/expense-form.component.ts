@@ -143,8 +143,8 @@ export class ExpenseFormComponent {
                     this.modelForm = new FormGroup({
                       id: new FormControl(aExpense.id, []),
                       concept: new FormControl(aExpense.concept, [Validators.required,Validators.minLength(3), Validators.maxLength(255)]),
-                      amount: new FormControl(aExpense.amount, [Validators.required, Validators.min(1), Validators.max(100000)]),
-                      paidBy: new FormControl(arr?.find(({id}) => id === aExpense.paidBy), [Validators.required]),
+                      amount: new FormControl({value:aExpense.amount, disabled:true}, [Validators.required, Validators.min(1), Validators.max(100000)]),
+                      paidBy: new FormControl({value: arr?.find(({id}) => id === aExpense.paidBy),disabled:true}, [Validators.required]),
                       expenseDate: new FormControl(aExpDate, []), 
                       maxDate: new FormControl(aMaxDate, []), 
                       expenseStatus: new FormControl(aExpense.expenseStatus, []) ,
