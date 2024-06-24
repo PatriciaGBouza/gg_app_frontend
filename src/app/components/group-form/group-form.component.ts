@@ -192,9 +192,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
   
 
   buildTreeNodeData(){
-    console.log('buildTreeNodeData  of '+this.arrParticipants.length +" participants" );
     for (let i=0;i<this.arrParticipants.length;i++){
-      console.log('adding node with participant id  '+this.arrParticipants[i].id.toString() +' and user '+this.user.id);
       let selectableValue=this.arrParticipants[i].id!=this.user.id;
       let newNode = {
         key: this.arrParticipants[i].id.toString(),
@@ -355,7 +353,9 @@ saveFormData(): void {
           duration: 3000,
           panelClass: ['snackbar-sucess']
         });
-                     
+        
+        this.modelForm.reset();
+        this.router.navigate(['/groups']);          
       },
       (error) => {
           console.error('Error handler:', error);
