@@ -15,6 +15,7 @@ import { IUser } from '../../interfaces/iuser.interface';
 import { BalanceComponent } from '../balance/balance.component';
 import { IApiResponse } from '../../interfaces/iapi-response';
 import { UserService } from '../../services/user.service';
+import { ExpensesService } from '../../services/expenses.service';
 
 
 
@@ -31,8 +32,9 @@ export class HomeComponent implements OnInit{
 
     groupsService = inject(GroupsService);
     userService = inject(UserService);
+    expensesService= inject (ExpensesService);
   
-  expenses: IExpense[]=[];
+  expensesInfo: IExpense[]=[];
   groupsInfo: IGroup[]=[];
 
   user: IUser = {} as IUser;;
@@ -46,36 +48,51 @@ export class HomeComponent implements OnInit{
       this.groupsService.getAllGroupsByUser(this.user).subscribe({
         next: (response: IApiResponse<IGroup[]>) => {
           this.groupsInfo = response.data;
-          this.expenses = [];
-
-          this.responsiveOptions = [
-            {
-              breakpoint: '1400px',
-              numVisible: 3,
-              numScroll: 3
-            },
-            {
-              breakpoint: '1220px',
-              numVisible: 2,
-              numScroll: 2
-            },
-            {
-              breakpoint: '1100px',
-              numVisible: 1,
-              numScroll: 1
-            }
-          ];
         },
         error: (error) => {
           console.error('Error fetching groups:', error);
         }
-      });
+      }
+    );
+    if (this.user) {
+      this.expensesService.getAllExpensesByUser(this.user).subscribe({
+        next: (response: IApiResponse<IExpense[]>) => {
+          console.log("HOME expensesService.getAllExpensesByUser returned " + JSON.stringify(response));
+          this.expensesInfo = response.data;
+        },
+        error: (error) => {
+          console.error('Error fetching groups:', error);
+        }
+      }
+    );
+
+
+
     } else {
       console.error('User not found in local storage');
     }
+
+    this.responsiveOptions = [
+      {
+        breakpoint: '1400px',
+        numVisible: 5,
+        numScroll: 3
+      },
+      {
+        breakpoint: '1220px',
+        numVisible: 4,
+        numScroll: 2
+      },
+      {
+        breakpoint: '1100px',
+        numVisible: 3,
+        numScroll: 1
+      }
+    ];
+
   }
 
- 
+}
 
 getExpenseStatus(status: string) {
   switch (status) {

@@ -46,7 +46,7 @@ export class ExpensesComponent {
 
   searchForm:FormGroup|any;
 
-  displayedColumns: string[] = ['concept', 'amount', 'paidBy', 'expenseDate', 'maxDate','expenseStatus', 'Tu parte','Tu estado','options'];
+  displayedColumns: string[] = ['group', 'concept', 'amount', 'paidBy', 'expenseDate', 'maxDate','expenseStatus', 'Tu parte','Tu estado','options'];
 
   arrGroups: IGroup[]=[];
   expensesInfo: IExpense[]=[];
