@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { GroupsService } from '../../services/groups.service';
@@ -14,6 +14,7 @@ import { IUser } from '../../interfaces/iuser.interface';
 
 import { BalanceComponent } from '../balance/balance.component';
 import { IApiResponse } from '../../interfaces/iapi-response';
+import { UserService } from '../../services/user.service';
 
 
 
@@ -26,43 +27,54 @@ import { IApiResponse } from '../../interfaces/iapi-response';
 })
 
 
-export class HomeComponent {
+export class HomeComponent implements OnInit{
 
-  groupsService = inject(GroupsService);
+    groupsService = inject(GroupsService);
+    userService = inject(UserService);
   
   expenses: IExpense[]=[];
   groupsInfo: IGroup[]=[];
 
-  user: IUser={ id: 1};
+  user: IUser = {} as IUser;;
 
   //CARROUSEL DATA
   responsiveOptions: any[] | undefined;
   
   ngOnInit() {
+    this.user = this.userService.getUserFromLocalStorage();
+    if (this.user) {
+      this.groupsService.getAllGroupsByUser(this.user).subscribe({
+        next: (response: IApiResponse<IGroup[]>) => {
+          this.groupsInfo = response.data;
+          this.expenses = [];
 
-    this.groupsService.getAllGroupsByCreatorUser(this.user).subscribe((response: IApiResponse<IGroup[]>) => {
-        console.log("groupsService.getAllGroupsByUser returned "+ JSON.stringify(response));
-        this.groupsInfo=  response.data;
-        this.expenses=[];
-
-        this.responsiveOptions = [
+          this.responsiveOptions = [
             {
-                breakpoint: '1400px',
-                numVisible: 3,
-                numScroll: 3
+              breakpoint: '1400px',
+              numVisible: 3,
+              numScroll: 3
             },
             {
-                breakpoint: '1220px',
-                numVisible: 2,
-                numScroll: 2
+              breakpoint: '1220px',
+              numVisible: 2,
+              numScroll: 2
             },
             {
-                breakpoint: '1100px',
-                numVisible: 1,
-                numScroll: 1
+              breakpoint: '1100px',
+              numVisible: 1,
+              numScroll: 1
             }
-        ];});
-}
+          ];
+        },
+        error: (error) => {
+          console.error('Error fetching groups:', error);
+        }
+      });
+    } else {
+      console.error('User not found in local storage');
+    }
+  }
+
  
 
 getExpenseStatus(status: string) {

@@ -11,6 +11,7 @@ import { UserStateService } from '../../services/user-state.service';
 import { UserService } from '../../services/user.service';
 import { BalanceService } from '../../services/balance.service';
 import { DecimalPipe } from '@angular/common';
+import { MembershipService } from '../../services/membership.service';
 
 @Component({
   selector: 'app-nav',
@@ -43,7 +44,7 @@ export class NavComponent implements OnInit {
     sanitizer: DomSanitizer,
     private userStateService: UserStateService,
     private userService: UserService,
-    private balanceService: BalanceService,
+    private membershipService: MembershipService,
     private decimalPipe: DecimalPipe
   ) {
     iconRegistry.addSvgIcon(
@@ -80,18 +81,22 @@ export class NavComponent implements OnInit {
     }
   }
 
-  // get name
 
-
-  //get balance from Balance component
   private loadUserBalance(): void {
-    this.balanceService.getTotalBalance().subscribe(totalAmount => {
-      this.userBalance = totalAmount;
-      this.updatedBalance = this.decimalPipe.transform(totalAmount, '1.2-2') + ' €';
-      //{{ number | number : '1.2-2'}}
-
+    this.membershipService.getUserBalance().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.userBalance = response.data.total_balance;
+          this.updatedBalance = this.decimalPipe.transform(this.userBalance, '1.2-2') + ' €';
+        } else {
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching user balance:', error);
+      }
     });
   }
+
 
   toggleSidePanel() {
     this.sidePanelOpen = !this.sidePanelOpen;
@@ -100,5 +105,6 @@ export class NavComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);
+    this.sidePanelOpen = !this.sidePanelOpen;
   }
 }

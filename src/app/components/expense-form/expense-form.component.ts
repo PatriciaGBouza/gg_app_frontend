@@ -62,6 +62,7 @@ export class ExpenseFormComponent {
   arrParticipantsWithinAGroup: IParticipant[]=[];
   uploadedFiles: any[] = [];
 
+
   aSnackBar: MatSnackBar;
 
 
@@ -92,7 +93,8 @@ export class ExpenseFormComponent {
 
     this.isEmptyForm = true;
     this.theGroupIfNoEmptyForm=-1;
-    this.aSnackBar=snackBar
+    this.aSnackBar=snackBar;
+    
   }
 
  
@@ -122,7 +124,6 @@ export class ExpenseFormComponent {
       const selectedId = params.id;
       console.log("--> ngOnInit with id "+ selectedId);
       if (selectedId !== undefined) {
-
         //case: edit expense
         if(isNaN(selectedId)){
           this.snackBar.open('Error leyendo id de gasto. Por favor, contacte con el administrador', 'Cerrar', {

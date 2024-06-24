@@ -4,6 +4,9 @@ import { Observable, tap } from 'rxjs';
 import { IApiResponse } from '../../interfaces/iapi-response';
 import { CommonModule} from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
+import { MembershipService } from '../../services/membership.service';
+import { SweetAlertService } from '../../services/sweet-alert.service';
 
 
 @Component({
@@ -22,6 +25,8 @@ export class NotificationsComponent implements OnInit {
 
   constructor(
     private notificationsService: NotificationsService,
+    private membershipService: MembershipService,
+    private sweetAlertService: SweetAlertService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -50,42 +55,98 @@ export class NotificationsComponent implements OnInit {
     this.currentTab = tab;
   }
 
-  markAllAsRead(): void {
-    this.notifications = this.notifications.map(notification => this.markAsRead(notification));
+  async markAllAsRead(): Promise<void> {
+    try {
+      const response = await firstValueFrom(this.notificationsService.setAllNotificationsToRead());
+      if (response.success) {
+        this.notifications = this.notifications.map(notification => {
+          notification.status = 'Read';
+          return notification;
+        });
+        this.snackBar.open('Todas las notificaciones se han marcado como leídas.', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-success']
+        });
+      }
+    } catch (error) {
+      console.error('Error al marcar todas las notificaciones como leídas:', error);
+      this.snackBar.open('Error al marcar todas las notificaciones como leídas.', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+      });
+    }
   }
 
-  markAsRead(notification: any): any {
+  async markAsRead(notification: any): Promise<any> {
     if (notification.status === 'Unread') {
-      notification.status = 'Read';
+      try {
+        const response = await firstValueFrom(this.notificationsService.changeNotificationStatusToRead(notification.id));
+        notification.status = 'Read';
+        this.snackBar.open('Notificación marcada como leída.', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-success']
+        });
+      } catch (error) {
+        console.error('Error al marcar la notificación como leída:', error);
+        this.snackBar.open('Error al marcar la notificación como leída.', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['snackbar-error']
+        });
+      }
     }
     return notification;
   }
-
-
+  
   getNotificationImage(notification: any): string {
+    let imageUrl = '';
+  
     if (notification.group_id && notification.expense_id) {
-      return 'assets/images/coins.png';
-    } else if (notification.group_id) {
-      return 'assets/images/groups.png';
+      imageUrl = 'assets/images/coins.png';
     } else {
-      return 'assets/images/default.png';
+      imageUrl = 'assets/images/groups.png';
     }
+  
+    console.log('Image URL:', imageUrl);
+    return imageUrl;
   }
 
   acceptInvitation(notification: any): void {
-// logic
-    this.snackBar.open('Invitación aceptada', 'Cerrar', { duration: 3000 });
-    //delete notification + send new one
-    this.notifications = this.notifications.filter(n => n.id !== notification.id);
-    this.updateMessage();
+    this.sweetAlertService.confirm('¿Está seguro de que desea aceptar esta invitación?').then(async result => {
+      if (result.isConfirmed) {
+        try {
+          const response = await firstValueFrom(this.membershipService.updateMembershipStatusToJoined(notification.group_id));
+          this.snackBar.open('Invitación aceptada', 'Cerrar', { duration: 3000 });
+  
+          //front
+          this.notifications = this.notifications.filter(n => n.id !== notification.id);
+          this.updateMessage();
+        } catch (error) {
+          console.error('Error al aceptar la invitación:', error);
+          this.snackBar.open('Error al aceptar la invitación', 'Cerrar', { duration: 3000, panelClass: ['snackbar-error'] });
+        }
+      }
+    });
   }
-
-  declineInvitation(notification: any): void {
-//logic
-    this.snackBar.open('Invitación rechazada', 'Cerrar', { duration: 3000 });
-    // delete notification
-    this.notifications = this.notifications.filter(n => n.id !== notification.id);
-    this.updateMessage();
+  
+  
+  
+  async declineInvitation(notification: any): Promise<void> {
+    console.log('Notification group_id:', notification.group_id); 
+    const result = await this.sweetAlertService.confirm('¿Está seguro de que desea rechazar esta invitación?');
+    
+    if (result.isConfirmed) {
+      try {
+        const response = await firstValueFrom(this.membershipService.refuseInvitation(notification.group_id));
+        this.snackBar.open('Invitación rechazada', 'Cerrar', { duration: 3000 });
+  
+        //front
+        this.notifications = this.notifications.filter(n => n.id !== notification.id);
+        this.updateMessage();
+      } catch (error) {
+        console.error('Error al rechazar la invitación:', error);
+        this.snackBar.open('Error al rechazar la invitación', 'Cerrar', { duration: 3000, panelClass: ['snackbar-error'] });
+      }
+    }
   }
   
 

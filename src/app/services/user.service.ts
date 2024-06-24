@@ -36,7 +36,7 @@ Stored user data: {"id":7,"name":"admin","email":"admin@gmail.com","image_url":"
     const user = this.getUserFromLocalStorage();
     return user ? user.name : null;
   }
-
+  
   getUserById(userId: string): Observable<IApiResponse<any>> {
     return this.http.get<IApiResponse<any>>(`${this.baseUrl}/${userId}`);
   }

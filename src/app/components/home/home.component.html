@@ -46,7 +46,7 @@
                         <div class="mb-3">
                             <div class="relative mx-auto">
                                 <img routerLinkActive="active" [routerLink]="['/editgroup',group.id]" [queryParams]="{parent: 'home'}"
-                                    src="/assets/images/groups.png" 
+                                    [src]="group.image ? group.image : '/assets/images/groups.png'" 
                                     [alt]="group.name" 
                                     class="group__image border-round" />
                                
