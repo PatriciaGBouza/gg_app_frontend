@@ -121,6 +121,8 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
       this.buildTreeNodeData();
       this.selectedParticipants=[];
       this.invitationsCount=0;
+      this.keys=[this.user.id.toString()];
+      if(this.keys!=undefined) this.preselectParticipants();
 
     },
     (error) => {
@@ -182,7 +184,7 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
             });
           });
                      
-       }
+       } 
       }
     });
       
@@ -192,11 +194,13 @@ www.myserver.mydomain.com/myfolder/mypage.aspx*/
   buildTreeNodeData(){
     console.log('buildTreeNodeData  of '+this.arrParticipants.length +" participants" );
     for (let i=0;i<this.arrParticipants.length;i++){
-      //console.log('adding node with participant id  '+this.arrParticipants[i].id.toString());
+      console.log('adding node with participant id  '+this.arrParticipants[i].id.toString() +' and user '+this.user.id);
+      let selectableValue=this.arrParticipants[i].id!=this.user.id;
       let newNode = {
         key: this.arrParticipants[i].id.toString(),
         label:  this.arrParticipants[i].name +' ( estado: ' +StateTranslation.getState(this.arrParticipants[i].state) + ' )' ,
         data:  this.arrParticipants[i].name,
+        selectable:selectableValue,
         icon: '',
         children: [ ]
       };
