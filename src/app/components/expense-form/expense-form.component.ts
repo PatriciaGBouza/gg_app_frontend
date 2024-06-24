@@ -266,7 +266,7 @@ export class ExpenseFormComponent {
       console.log(" updateParticipantsOnForm with participant in index "+i +" participant " +arrParticipation[i].participantName);
       let participantItem = new FormGroup({
         participantName: new FormControl({value: arrParticipation[i].participantName, disabled:true}, [Validators.required]),
-        percentage: new FormControl({value:arrParticipation[i].percentage?.toFixed(2), disabled:true}, [Validators.required]),
+        percentage: new FormControl({value:this.formatPercentage(arrParticipation[i].percentage), disabled:true}, [Validators.required]),
         amount: new FormControl({value:arrParticipation[i].amount?.toFixed(2), disabled:true}, [Validators.required,  Validators.max(100)]),
         expenseStatus: new FormControl({value:arrParticipation[i].expenseStatus, disabled:true}, []),
       });
@@ -277,6 +277,12 @@ export class ExpenseFormComponent {
       // Add the new form group to the FormArray
       this.participants.insert(i,participantItem);
     }
+  }
+
+  formatPercentage(cant:any):string{
+    if(cant===undefined) return '0 %'
+    let res=cant*100;
+    return `${res.toFixed(2)} %`
   }
 
   
