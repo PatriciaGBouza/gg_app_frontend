@@ -17,6 +17,12 @@
     width: 100px;
 }
 
+.expense__image{
+    width: 75px;
+}
+
+
+
 .test{
     border-color: red;
     border-width: 5px;

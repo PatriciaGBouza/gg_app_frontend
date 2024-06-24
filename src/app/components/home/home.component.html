@@ -2,8 +2,8 @@
     <div class="container" >
         <div class="row panels">
             <p-carousel 
-            [value]="expenses" 
-            [numVisible]="3" 
+            [value]="expensesInfo" 
+            [numVisible]="5" 
             [numScroll]="1" 
             [responsiveOptions]="responsiveOptions">
                 <ng-template pTemplate="header">
@@ -13,19 +13,19 @@
                     <div class="border-1 surface-border border-round m-2 p-3">
                         <div class="mb-3">
                             <div class="relative mx-auto">
-                                <img 
+                                <img routerLinkActive="active" [routerLink]="['/editexpense',expense.id]" [queryParams]="{parent: 'home'}"
                                     src="/assets/images/money.png" 
                                     [alt]="expense.concept" 
-                                    class="w-full border-round" />
+                                    class="expense__image" />
                                 <p-tag 
-                                    [value]="expense.status" 
-                                    [severity]="getExpenseStatus(expense.status)" 
+                                    [value]="expense.myStatus" 
+                                    [severity]="getExpenseStatus(expense.myStatus)" 
                                     class="absolute" 
                                     [ngStyle]="{ 'left.px': 5, 'top.px': 5 }" />
                             </div>
                         </div>
                         <div class="mb-3 font-medium">
-                            {{ expense.name }}
+                            {{ expense.concept }}
                         </div>
                      </div>
                 </ng-template>
@@ -35,7 +35,7 @@
          <div class="row panels">
             <p-carousel 
             [value]="groupsInfo" 
-            [numVisible]="3" 
+            [numVisible]="5" 
             [numScroll]="1" 
             [responsiveOptions]="responsiveOptions">
                 <ng-template pTemplate="header">
